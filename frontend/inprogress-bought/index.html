@@ -89,7 +89,7 @@ function MiniAppFrame({children,width=393,height=852,time='9:41',battery=85,dark
         <div style={frameStyles.dynamicIsland}/>
         <div style={frameStyles.wechatTopBar}>
           <div style={frameStyles.navLeft}>
-            <button style={frameStyles.backBtn}>
+            <button style={frameStyles.backBtn} onClick={() => window.location.href = '../index.html'}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="15 18 9 12 15 6" />
               </svg>
