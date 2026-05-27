@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>权益卡裂变邀请 · 预告期</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="js/utils.js"></script>
+
+  <!-- ─── MiniAppFrame Component ─── -->
+  <script type="text/babel">
+    const miniappFrameStyles = {
+      wrapper: {
+        display: 'inline-block', padding: 3, background: '#1a1a1a',
+        borderRadius: 50, boxShadow: '0 8px 40px rgba(0,0,0,0.18)', position: 'relative',
+      },
+      screen: {
+        position: 'relative', borderRadius: 48, overflow: 'hidden', background: '#fff',
+      },
+      statusBar: {
+        position: 'absolute', top: 0, left: 0, right: 0, height: 54,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 32px 0 32px', fontSize: 16, fontWeight: 600,
+        fontFamily: '-apple-system, "SF Pro Text", sans-serif',
+        zIndex: 20, pointerEvents: 'none',
+      },
+      dynamicIsland: {
+        position: 'absolute', top: 12, left: '50%', transform: 'translateX(-50%)',
+        width: 124, height: 36, background: '#000', borderRadius: 999, zIndex: 30,
+      },
+      statusIcons: { display: 'flex', alignItems: 'center', gap: 6 },
+      signalIcon: { display: 'flex', alignItems: 'flex-end', gap: 2, height: 12 },
+      signalBar: { width: 3, background: 'currentColor', borderRadius: 1 },
+      batteryIcon: {
+        width: 26, height: 12, border: '1.5px solid currentColor', borderRadius: 3,
+        padding: 1, position: 'relative', opacity: 0.8,
+      },
+      batteryCap: {
+        position: 'absolute', top: 3, right: -3, width: 2, height: 6,
+        background: 'currentColor', borderRadius: '0 1px 1px 0',
+      },
+      wechatTopBar: {
+        position: 'absolute', top: 50, left: 0, right: 0, height: 44,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 15px', zIndex: 15,
+      },
+      navLeft: { display: 'flex', alignItems: 'center', gap: 0 },
+      wechatPill: {
+        display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.85)',
+        borderRadius: 20, padding: '4px 4px', backdropFilter: 'blur(10px)',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+      },
+      wechatMore: {
+        width: 32, height: 32, display: 'flex', alignItems: 'center',
+        justifyContent: 'center', cursor: 'pointer',
+      },
+      wechatDivider: { width: 1, height: 16, background: 'rgba(0,0,0,0.08)', flexShrink: 0 },
+      wechatClose: {
+        width: 32, height: 32, display: 'flex', alignItems: 'center',
+        justifyContent: 'center', cursor: 'pointer',
+      },
+      content: {
+        position: 'absolute', top: 94, left: 0, right: 0, bottom: 34,
+        overflowY: 'auto', overflowX: 'hidden',
+      },
+      homeIndicator: {
+        position: 'absolute', bottom: 10, left: '50%', transform: 'translateX(-50%)',
+        width: 140, height: 5, background: 'rgba(0,0,0,0.3)', borderRadius: 999, zIndex: 10,
+      },
+    };
+
+    function MiniAppFrame({ children, width = 393, height = 852, time = '9:41', battery = 85, darkMode = false, contentBg = '#FFF8F0' }) {
+      const textColor = darkMode ? '#fff' : '#000';
+      return (
+        <div style={miniappFrameStyles.wrapper}>
+          <div style={{ ...miniappFrameStyles.screen, width, height, background: darkMode ? '#000' : '#fff' }}>
+            <div style={{ ...miniappFrameStyles.statusBar, color: textColor }}>
+              <span>{time}</span>
+              <div style={miniappFrameStyles.statusIcons}>
+                <div style={miniappFrameStyles.signalIcon}>
+                  <div style={{ ...miniappFrameStyles.signalBar, height: 4 }} />
+                  <div style={{ ...miniappFrameStyles.signalBar, height: 6 }} />
+                  <div style={{ ...miniappFrameStyles.signalBar, height: 9 }} />
+                  <div style={{ ...miniappFrameStyles.signalBar, height: 11 }} />
+                </div>
+                <svg width="16" height="12" viewBox="0 0 16 12" fill="none" style={{ color: textColor }}>
+                  <path d="M8 11.5a1 1 0 100-2 1 1 0 000 2z" fill="currentColor" />
+                  <path d="M3 7.5a7 7 0 0110 0" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" />
+                  <path d="M1 4.5a11 11 0 0114 0" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" opacity="0.7" />
+                </svg>
+                <div style={miniappFrameStyles.batteryIcon}>
+                  <div style={{ width: `${battery}%`, height: '100%', background: 'currentColor', borderRadius: 1, opacity: 0.9 }} />
+                  <div style={miniappFrameStyles.batteryCap} />
+                </div>
+              </div>
+            </div>
+            <div style={miniappFrameStyles.dynamicIsland} />
+            <div style={miniappFrameStyles.wechatTopBar}>
+              <div style={miniappFrameStyles.navLeft}>
+                <button
+                  onClick={miniappFrameStyles.onBack}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 0,
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    padding: '4px 2px', borderRadius: 8,
+                    fontSize: 14, color: '#333', fontWeight: 500,
+                  }}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="15 18 9 12 15 6" />
+                  </svg>
+                </button>
+              </div>
+              <div style={miniappFrameStyles.wechatPill}>
+                <div style={miniappFrameStyles.wechatMore}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <circle cx="6" cy="12" r="2" fill="#333" />
+                    <circle cx="12" cy="12" r="2" fill="#333" />
+                    <circle cx="18" cy="12" r="2" fill="#333" />
+                  </svg>
+                </div>
+                <div style={miniappFrameStyles.wechatDivider} />
+                <div style={miniappFrameStyles.wechatClose}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.2">
+                    <circle cx="12" cy="12" r="8" />
+                    <circle cx="12" cy="12" r="3.5" fill="#333" stroke="none" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div style={{ ...miniappFrameStyles.content, background: contentBg }}>
+              {children}
+            </div>
+            <div style={miniappFrameStyles.homeIndicator} />
+          </div>
+        </div>
+      );
+    }
+  </script>
+
+  <!-- ─── PosterCanvas Component — 夏日湖面倒影 ─── -->
+  <!-- 动画标注: 天空渐变+夕阳+云彩视差 → L3 | 星星序列淡入 → L2 | 水波纹(多层sine+断裂) → L3 | 倒影系统 → L3 | 萤火虫(Perlin+呼吸+倒影) → L3 | 中心星光晕 → L2 | 仅 WEB -->
+  <script type="text/babel">
+    const PosterCanvas = React.memo(function PosterCanvas({ width = 361, height = 220 }) {
+      const canvasRef = React.useRef(null);
+
+      React.useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+
+        const HORIZON_Y = Math.floor(height * 0.45); // 99
+        const SKY_TOP = 0;
+        const WATER_BOTTOM = height;
+
+        // ── 工具函数 ──
+        function lerp(a, b, t) { return a + (b - a) * t; }
+        function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+        // 简易 Perlin Noise (1D)
+        const perm = new Uint8Array(512);
+        const permMod = new Uint8Array(512);
+        (function initNoise() {
+          const p = [];
+          for (let i = 0; i < 256; i++) p[i] = i;
+          for (let i = 255; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [p[i], p[j]] = [p[j], p[i]];
+          }
+          for (let i = 0; i < 512; i++) { perm[i] = p[i & 255]; permMod[i] = perm[i] % 12; }
+        })();
+
+        function fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+        function lerpNoise(a, b, t) { return a + t * (b - a); }
+        function grad(hash, x) {
+          const h = hash & 3;
+          return (h < 2 ? x : -x);
+        }
+        function noise1D(x) {
+          const X = Math.floor(x) & 255;
+          x -= Math.floor(x);
+          const u = fade(x);
+          return lerpNoise(grad(perm[X], x), grad(perm[X + 1], x - 1), u);
+        }
+        function fbm(x, octaves) {
+          let val = 0, amp = 1, freq = 1, max = 0;
+          for (let i = 0; i < octaves; i++) {
+            val += noise1D(x * freq) * amp;
+            max += amp;
+            amp *= 0.5;
+            freq *= 2;
+          }
+          return val / max;
+        }
+
+        // ── 第 2 层: 夕阳 ──
+        const sun = {
+          x: width * 0.5,
+          baseY: HORIZON_Y - 25,
+          radius: 38,
+          update(t) {
+            this.y = this.baseY + Math.sin(t * 0.0003) * 5;
+            this.opacity = 0.6 + Math.sin(t * 0.0002) * 0.15;
+          },
+          draw(ctx) {
+            const { x, y, radius, opacity } = this;
+            const grad = ctx.createRadialGradient(x, y, 0, x, y, radius * 2.5);
+            grad.addColorStop(0, `rgba(255,220,160,${opacity * 0.6})`);
+            grad.addColorStop(0.3, `rgba(255,200,120,${opacity * 0.2})`);
+            grad.addColorStop(0.7, `rgba(255,180,100,${opacity * 0.05})`);
+            grad.addColorStop(1, 'rgba(255,180,100,0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, width, height);
+          }
+        };
+
+        // ─ 第 3 层: 云彩（3 组视差） ──
+        class Cloud {
+          constructor(y, speed, scale, opacity) {
+            this.y = y; this.speed = speed; this.scale = scale;
+            this.opacity = opacity; this.x = Math.random() * (width + 100) - 50;
+            // 云团由多个重叠圆组成
+            this.blobs = [];
+            const count = 4 + Math.floor(Math.random() * 4);
+            for (let i = 0; i < count; i++) {
+              this.blobs.push({
+                ox: (Math.random() - 0.5) * 60 * scale,
+                oy: (Math.random() - 0.5) * 15 * scale,
+                r: (12 + Math.random() * 18) * scale,
+              });
+            }
+          }
+          update(t) {
+            this.x -= this.speed;
+            if (this.x < -120) this.x = width + 60;
+          }
+          draw(ctx) {
+            ctx.save();
+            ctx.globalAlpha = this.opacity;
+            for (const b of this.blobs) {
+              const grad = ctx.createRadialGradient(
+                this.x + b.ox, this.y + b.oy, 0,
+                this.x + b.ox, this.y + b.oy, b.r
+              );
+              grad.addColorStop(0, 'rgba(255,240,220,0.6)');
+              grad.addColorStop(0.6, 'rgba(255,230,200,0.2)');
+              grad.addColorStop(1, 'rgba(255,230,200,0)');
+              ctx.fillStyle = grad;
+              ctx.beginPath();
+              ctx.arc(this.x + b.ox, this.y + b.oy, b.r, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            ctx.restore();
+          }
+        }
+
+        const clouds = [
+          new Cloud(18, 0.12, 1.2, 0.18),
+          new Cloud(42, 0.08, 0.9, 0.12),
+          new Cloud(65, 0.15, 1.0, 0.15),
+          new Cloud(28, 0.06, 0.7, 0.10),
+          new Cloud(55, 0.10, 0.8, 0.14),
+        ];
+
+        // ─ 第 4 层: 星星（8 颗，依次淡入） ─
+        class SkyStar {
+          constructor(x, y, size, delay) {
+            this.x = x; this.y = y; this.size = size; this.delay = delay;
+            this.appeared = false; this.brightness = 0;
+            this.twinklePhase = Math.random() * Math.PI * 2;
+            this.twinkleSpeed = 0.003 + Math.random() * 0.004;
+            this.flashCount = 0; this.flashing = false; this.flashTime = 0;
+          }
+          update(t) {
+            if (!this.appeared && t > this.delay) {
+              this.appeared = true;
+              this.flashing = true;
+              this.flashTime = t;
+            }
+            if (this.flashing) {
+              this.flashCount = Math.floor((t - this.flashTime) / 200);
+              if (this.flashCount >= 3) {
+                this.flashing = false;
+                this.brightness = 1;
+              } else {
+                this.brightness = this.flashCount % 2 === 0 ? 0.3 : 0.9;
+              }
+            } else if (this.appeared) {
+              this.brightness = 0.6 + Math.sin(t * this.twinkleSpeed + this.twinklePhase) * 0.3;
+            }
+          }
+          draw(ctx) {
+            if (!this.appeared) return;
+            ctx.save();
+            ctx.globalAlpha = this.brightness * 0.8;
+            // 星形
+            const s = this.size;
+            const cx = this.x, cy = this.y;
+            ctx.fillStyle = '#FFF8DC';
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+              const angle = (i * 4 * Math.PI / 5) - Math.PI / 2;
+              const r = i === 0 ? s : s * 0.4;
+              const method = i === 0 ? 'moveTo' : 'lineTo';
+              ctx[method](cx + Math.cos(angle) * s, cy + Math.sin(angle) * s);
+              const innerAngle = angle + (2 * Math.PI / 10);
+              ctx.lineTo(cx + Math.cos(innerAngle) * s * 0.4, cy + Math.sin(innerAngle) * s * 0.4);
+            }
+            ctx.closePath();
+            ctx.fill();
+            // 光晕
+            const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, s * 3);
+            glow.addColorStop(0, `rgba(255,248,220,${this.brightness * 0.3})`);
+            glow.addColorStop(1, 'rgba(255,248,220,0)');
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(cx, cy, s * 3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+        }
+
+        const skyStars = [
+          new SkyStar(50, 20, 3, 500),
+          new SkyStar(120, 35, 2.5, 1000),
+          new SkyStar(200, 15, 2, 1500),
+          new SkyStar(280, 45, 3, 2000),
+          new SkyStar(310, 25, 2.5, 2500),
+          new SkyStar(80, 55, 2, 3000),
+          new SkyStar(250, 60, 2, 3500),
+          new SkyStar(160, 50, 3.5, 4000), // 最大的星
+        ];
+
+        // ── 第 7 层: 水波纹（4 条，多层 sine + 断裂效果） ──
+        class Ripple {
+          constructor(y, baseY, amplitude, speed, color) {
+            this.y = y; this.baseY = baseY;
+            this.amplitude = amplitude; this.speed = speed;
+            this.color = color;
+            // 断裂状态
+            this.breakPhase = Math.random() * 100;
+            this.breakDuration = 2000 + Math.random() * 3000;
+            this.isBroken = false;
+            this.breakTimer = 0;
+            this.nextBreak = 5000 + Math.random() * 10000;
+          }
+          getY(x, t) {
+            // 3 层 sine 叠加
+            const y1 = Math.sin(x * 0.02 + t * this.speed * 0.001) * this.amplitude;
+            const y2 = Math.sin(x * 0.05 + t * this.speed * 0.0015 + 1.3) * this.amplitude * 0.4;
+            const y3 = Math.sin(x * 0.01 + t * this.speed * 0.0005 + 2.7) * this.amplitude * 0.6;
+            // Perlin noise 微扰
+            const noise = fbm(x * 0.008 + t * 0.0001, 3) * this.amplitude * 0.5;
+            return this.baseY + y1 + y2 + y3 + noise;
+          }
+          update(t) {
+            this.breakTimer += 16;
+            if (!this.isBroken && this.breakTimer > this.nextBreak) {
+              this.isBroken = true;
+              this.breakTimer = 0;
+            }
+            if (this.isBroken && this.breakTimer > this.breakDuration) {
+              this.isBroken = false;
+              this.breakTimer = 0;
+              this.nextBreak = 5000 + Math.random() * 10000;
+            }
+          }
+          draw(ctx, t) {
+            ctx.save();
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = 0.8;
+            ctx.lineCap = 'round';
+
+            if (this.isBroken) {
+              const segments = 2 + Math.floor(Math.random() * 2);
+              const segLen = width / segments;
+              for (let s = 0; s < segments; s++) {
+                const skip = Math.random() > 0.6;
+                if (skip) continue;
+                const startX = s * segLen + segLen * 0.1;
+                const endX = (s + 1) * segLen - segLen * 0.1;
+                ctx.beginPath();
+                for (let x = startX; x <= endX; x += 1) {
+                  const y = this.getY(x, t);
+                  x === startX ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+              }
+            } else {
+              ctx.beginPath();
+              for (let x = 0; x <= width; x += 1) {
+                const y = this.getY(x, t);
+                x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+              }
+              ctx.stroke();
+            }
+            ctx.restore();
+          }
+        }
+
+        const ripples = [
+          new Ripple(0, HORIZON_Y + 15, 2.0, 1.0, 'rgba(255,220,160,0.25)'),
+          new Ripple(0, HORIZON_Y + 35, 1.8, 0.8, 'rgba(255,210,140,0.20)'),
+          new Ripple(0, HORIZON_Y + 58, 1.5, 1.2, 'rgba(255,200,120,0.15)'),
+          new Ripple(0, HORIZON_Y + 82, 1.2, 0.6, 'rgba(255,190,100,0.12)'),
+        ];
+
+        // ── 第 9 层: 光斑（3 个有机形状） ─
+        class LightSpot {
+          constructor(x, y, baseSize) {
+            this.x = x; this.y = y; this.baseSize = baseSize;
+            this.phase = Math.random() * Math.PI * 2;
+            this.driftX = (Math.random() - 0.5) * 0.15;
+            this.driftY = (Math.random() - 0.5) * 0.05;
+            // 有机形状控制点
+            this.points = [];
+            const count = 6 + Math.floor(Math.random() * 3);
+            for (let i = 0; i < count; i++) {
+              this.points.push({
+                angle: (i / count) * Math.PI * 2,
+                baseR: baseSize * (0.7 + Math.random() * 0.6),
+                morphSpeed: 0.001 + Math.random() * 0.002,
+                morphPhase: Math.random() * Math.PI * 2,
+              });
+            }
+          }
+          update(t) {
+            this.x += this.driftX;
+            this.y += this.driftY;
+            // 边界反弹
+            if (this.x < 30 || this.x > width - 30) this.driftX *= -1;
+            if (this.y < HORIZON_Y + 10 || this.y > WATER_BOTTOM - 20) this.driftY *= -1;
+            this.phase += 0.005;
+          }
+          draw(ctx, t) {
+            const brightness = 0.5 + Math.sin(this.phase) * 0.3;
+            ctx.save();
+            ctx.globalAlpha = brightness * 0.25;
+            // 绘制有机形状
+            ctx.beginPath();
+            const pts = this.points.map(p => {
+              const r = p.baseR + Math.sin(t * p.morphSpeed + p.morphPhase) * p.baseR * 0.2;
+              return {
+                x: this.x + Math.cos(p.angle) * r,
+                y: this.y + Math.sin(p.angle) * r * 0.6,
+              };
+            });
+            // Catmull-Rom 平滑曲线
+            ctx.moveTo(pts[0].x, pts[0].y);
+            for (let i = 0; i < pts.length; i++) {
+              const p0 = pts[(i - 1 + pts.length) % pts.length];
+              const p1 = pts[i];
+              const p2 = pts[(i + 1) % pts.length];
+              const p3 = pts[(i + 2) % pts.length];
+              ctx.bezierCurveTo(
+                p1.x + (p2.x - p0.x) / 6, p1.y + (p2.y - p0.y) / 6,
+                p2.x - (p3.x - p1.x) / 6, p2.y - (p3.y - p1.y) / 6,
+                p2.x, p2.y
+              );
+            }
+            ctx.closePath();
+            const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.baseSize * 1.5);
+            grad.addColorStop(0, 'rgba(255,235,180,0.6)');
+            grad.addColorStop(0.5, 'rgba(255,220,150,0.2)');
+            grad.addColorStop(1, 'rgba(255,220,150,0)');
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.restore();
+          }
+        }
+
+        const lightSpots = [
+          new LightSpot(width * 0.3, HORIZON_Y + 30, 25),
+          new LightSpot(width * 0.65, HORIZON_Y + 55, 20),
+          new LightSpot(width * 0.5, HORIZON_Y + 80, 30),
+        ];
+
+        // ── 第 10 层: 萤火虫（18 个，Perlin 轨迹 + 呼吸 + 倒影） ──
+        class Firefly {
+          constructor() {
+            this.reset();
+          }
+          reset() {
+            this.x = 30 + Math.random() * (width - 60);
+            this.y = HORIZON_Y + 5 + Math.random() * (WATER_BOTTOM - HORIZON_Y - 40);
+            this.size = 1 + Math.random() * 2;
+            this.brightness = 0.5 + Math.random() * 0.5;
+            this.breathPhase = Math.random() * Math.PI * 2;
+            this.breathSpeed = 0.003 + Math.random() * 0.005;
+            this.noiseOffsetX = Math.random() * 1000;
+            this.noiseOffsetY = Math.random() * 1000;
+            this.speed = 0.3 + Math.random() * 0.5;
+            // 颜色变体
+            const colors = ['#FFD700', '#FFF0D9', '#FFF8DC', '#F0D68A'];
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+            // "停留"行为
+            this.isLanding = false;
+            this.landTimer = 0;
+            this.landDuration = 0;
+          }
+          update(t) {
+            // Perlin noise 驱动运动
+            const nx = fbm(this.noiseOffsetX + t * 0.0003 * this.speed, 3);
+            const ny = fbm(this.noiseOffsetY + t * 0.0003 * this.speed, 3);
+            this.x += nx * this.speed * 0.8;
+            this.y += ny * this.speed * 0.4;
+
+            // 边界处理
+            if (this.x < 10) { this.x = 10; this.noiseOffsetX += 50; }
+            if (this.x > width - 10) { this.x = width - 10; this.noiseOffsetX += 50; }
+            if (this.y < HORIZON_Y + 3) { this.y = HORIZON_Y + 3; this.noiseOffsetY += 50; }
+            if (this.y > WATER_BOTTOM - 15) { this.y = WATER_BOTTOM - 15; this.noiseOffsetY += 50; }
+
+            // 呼吸
+            this.breathPhase += this.breathSpeed;
+            this.currentBrightness = this.brightness * (0.5 + Math.sin(this.breathPhase) * 0.5);
+
+            // 偶发"停留"行为（5% 概率每帧）
+            if (!this.isLanding && Math.random() < 0.0005) {
+              this.isLanding = true;
+              this.landTimer = 0;
+              this.landDuration = 1000 + Math.random() * 2000;
+            }
+            if (this.isLanding) {
+              this.landTimer += 16;
+              if (this.landTimer > this.landDuration) {
+                this.isLanding = false;
+              }
+            }
+          }
+          draw(ctx, t) {
+            ctx.save();
+            const glow = this.currentBrightness;
+            // 萤火虫本体
+            ctx.globalAlpha = glow;
+            const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 5);
+            grad.addColorStop(0, this.color);
+            grad.addColorStop(0.3, this.color + '80');
+            grad.addColorStop(1, this.color + '00');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size * 4, 0, Math.PI * 2);
+            ctx.fill();
+            // 核心亮点
+            ctx.globalAlpha = glow * 0.9;
+            ctx.fillStyle = '#FFF8DC';
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size * 0.6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+            // 水面倒影
+            const refY = HORIZON_Y + Math.abs(this.y - HORIZON_Y);
+            if (refY < WATER_BOTTOM - 5) {
+              let rippleOffset = 0;
+              for (const r of ripples) {
+                const dist = Math.abs(refY - r.baseY);
+                if (dist < 30) {
+                  rippleOffset += r.getY(this.x, t) - r.baseY;
+                }
+              }
+              ctx.save();
+              ctx.globalAlpha = glow * 0.15;
+              const refGrad = ctx.createRadialGradient(this.x, refY + rippleOffset, 0, this.x, refY + rippleOffset, this.size * 6);
+              refGrad.addColorStop(0, this.color + '60');
+              refGrad.addColorStop(1, this.color + '00');
+              ctx.fillStyle = refGrad;
+              ctx.beginPath();
+              ctx.arc(this.x, refY + rippleOffset, this.size * 6, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.restore();
+            }
+          }
+        }
+
+        const fireflies = Array.from({ length: 18 }, () => {
+          const f = new Firefly();
+          f.x = 30 + Math.random() * (width - 60);
+          f.y = HORIZON_Y + 5 + Math.random() * 60;
+          return f;
+        });
+
+        // ── 第 11 层: 中心大星 ──
+        const centerStar = {
+          x: width / 2,
+          y: HORIZON_Y - 5,
+          size: 20,
+          phase: 0,
+          update(t) {
+            this.phase = t * 0.002;
+          },
+          draw(ctx) {
+            const { x, y, size, phase } = this;
+            const pulse = 1 + Math.sin(phase) * 0.1;
+            const s = size * pulse;
+
+            ctx.save();
+            // 外层大光晕
+            const outerGlowSize = s * 6;
+            const outerGlowAlpha = 0.15 + Math.sin(phase) * 0.08;
+            const outerGlow = ctx.createRadialGradient(x, y, 0, x, y, outerGlowSize);
+            outerGlow.addColorStop(0, `rgba(255,240,200,${outerGlowAlpha})`);
+            outerGlow.addColorStop(0.4, `rgba(255,220,150,${outerGlowAlpha * 0.3})`);
+            outerGlow.addColorStop(1, 'rgba(255,220,150,0)');
+            ctx.fillStyle = outerGlow;
+            ctx.beginPath();
+            ctx.arc(x, y, outerGlowSize, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 内层光晕
+            const glowSize = s * 3;
+            const glowAlpha = 0.4 + Math.sin(phase) * 0.2;
+            const glow = ctx.createRadialGradient(x, y, 0, x, y, glowSize);
+            glow.addColorStop(0, `rgba(255,248,220,${glowAlpha})`);
+            glow.addColorStop(0.5, `rgba(255,230,180,${glowAlpha * 0.3})`);
+            glow.addColorStop(1, 'rgba(255,230,180,0)');
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(x, y, glowSize, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 星形
+            ctx.globalAlpha = 0.9;
+            ctx.fillStyle = '#FFF8DC';
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+              const angle = (i * 4 * Math.PI / 5) - Math.PI / 2;
+              const outerR = s;
+              const innerR = s * 0.4;
+              const outerX = x + Math.cos(angle) * outerR;
+              const outerY = y + Math.sin(angle) * outerR;
+              const innerAngle = angle + (Math.PI / 5);
+              const innerX = x + Math.cos(innerAngle) * innerR;
+              const innerY = y + Math.sin(innerAngle) * innerR;
+              if (i === 0) ctx.moveTo(outerX, outerY);
+              else ctx.lineTo(outerX, outerY);
+              ctx.lineTo(innerX, innerY);
+            }
+            ctx.closePath();
+            ctx.fill();
+
+            // 十字光芒
+            ctx.globalAlpha = 0.25 + Math.sin(phase) * 0.12;
+            ctx.strokeStyle = '#FFF0D0';
+            ctx.lineWidth = 1;
+            const rayLen = s * 3;
+            ctx.beginPath();
+            ctx.moveTo(x - rayLen, y); ctx.lineTo(x + rayLen, y);
+            ctx.moveTo(x, y - rayLen); ctx.lineTo(x, y + rayLen);
+            ctx.stroke();
+
+            // 对角线光芒（更细更淡）
+            ctx.globalAlpha = 0.12 + Math.sin(phase * 1.3) * 0.06;
+            ctx.lineWidth = 0.5;
+            const diagLen = s * 2;
+            ctx.beginPath();
+            ctx.moveTo(x - diagLen, y - diagLen); ctx.lineTo(x + diagLen, y + diagLen);
+            ctx.moveTo(x - diagLen, y + diagLen); ctx.lineTo(x + diagLen, y - diagLen);
+            ctx.stroke();
+
+            ctx.restore();
+          }
+        };
+
+        // ── 主绘制循环 ──
+        let animFrame;
+        const startTime = Date.now();
+
+        function drawSky(ctx, t) {
+          const grad = ctx.createLinearGradient(0, SKY_TOP, 0, HORIZON_Y);
+          grad.addColorStop(0, '#FFD6A0');
+          grad.addColorStop(0.4, '#F5C88A');
+          grad.addColorStop(0.7, '#E8B870');
+          grad.addColorStop(1, '#D4A060');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, SKY_TOP, width, HORIZON_Y);
+        }
+
+        function drawWater(ctx, t) {
+          const grad = ctx.createLinearGradient(0, HORIZON_Y, 0, WATER_BOTTOM);
+          grad.addColorStop(0, '#D4A060');
+          grad.addColorStop(0.3, '#C89050');
+          grad.addColorStop(0.6, '#B88040');
+          grad.addColorStop(1, '#A87030');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, HORIZON_Y, width, WATER_BOTTOM - HORIZON_Y);
+        }
+
+        function drawHorizon(ctx, t) {
+          ctx.save();
+          const shimmer = 0.35 + Math.sin(t * 0.003) * 0.1;
+          ctx.globalAlpha = shimmer;
+          ctx.strokeStyle = '#D4A017';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(0, HORIZON_Y);
+          ctx.lineTo(width, HORIZON_Y);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        function drawReflections(ctx, t) {
+          // 倒影：将天空元素在水面中反射
+          ctx.save();
+          // 云彩倒影
+          for (const c of clouds) {
+            ctx.globalAlpha = c.opacity * 0.15;
+            const refY = HORIZON_Y + (HORIZON_Y - c.y);
+            if (refY < WATER_BOTTOM) {
+              for (const b of c.blobs) {
+                // 波纹偏移
+                let offsetX = 0, offsetY = 0;
+                for (const r of ripples) {
+                  const dist = Math.abs(refY - r.baseY);
+                  if (dist < 40) {
+                    const waveY = r.getY(c.x + b.ox, t);
+                    offsetY += (waveY - r.baseY) * 0.3;
+                  }
+                }
+                const grad = ctx.createRadialGradient(
+                  c.x + b.ox + offsetX, refY + b.oy + offsetY, 0,
+                  c.x + b.ox + offsetX, refY + b.oy + offsetY, b.r * 1.2
+                );
+                grad.addColorStop(0, 'rgba(255,230,200,0.4)');
+                grad.addColorStop(1, 'rgba(255,230,200,0)');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(c.x + b.ox + offsetX, refY + b.oy + offsetY, b.r * 1.2, 0, Math.PI * 2);
+                ctx.fill();
+              }
+            }
+          }
+
+          // 夕阳倒影
+          const sunRefY = HORIZON_Y + (HORIZON_Y - sun.y) + 10;
+          if (sunRefY < WATER_BOTTOM) {
+            let rippleOffset = 0;
+            for (const r of ripples) {
+              const dist = Math.abs(sunRefY - r.baseY);
+              if (dist < 40) rippleOffset += (r.getY(sun.x, t) - r.baseY) * 0.2;
+            }
+            ctx.globalAlpha = sun.opacity * 0.2;
+            const grad = ctx.createRadialGradient(sun.x, sunRefY + rippleOffset, 0, sun.x, sunRefY + rippleOffset, sun.radius * 2);
+            grad.addColorStop(0, 'rgba(255,220,160,0.5)');
+            grad.addColorStop(0.5, 'rgba(255,200,120,0.15)');
+            grad.addColorStop(1, 'rgba(255,200,120,0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(sun.x - sun.radius * 2, sunRefY + rippleOffset - sun.radius * 2, sun.radius * 4, sun.radius * 4);
+          }
+
+          // 星星倒影
+          for (const s of skyStars) {
+            if (!s.appeared) continue;
+            const refY = HORIZON_Y + (HORIZON_Y - s.y);
+            if (refY < WATER_BOTTOM - 5) {
+              let rippleOffset = 0;
+              for (const r of ripples) {
+                const dist = Math.abs(refY - r.baseY);
+                if (dist < 30) rippleOffset += (r.getY(s.x, t) - r.baseY) * 0.15;
+              }
+              ctx.globalAlpha = s.brightness * 0.12;
+              const grad = ctx.createRadialGradient(s.x, refY + rippleOffset, 0, s.x, refY + rippleOffset, s.size * 3);
+              grad.addColorStop(0, 'rgba(255,248,220,0.5)');
+              grad.addColorStop(1, 'rgba(255,248,220,0)');
+              ctx.fillStyle = grad;
+              ctx.beginPath();
+              ctx.arc(s.x, refY + rippleOffset, s.size * 3, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+          ctx.restore();
+        }
+
+        function animate() {
+          const t = Date.now() - startTime;
+          ctx.clearRect(0, 0, width, height);
+
+          // 1. 天空渐变
+          drawSky(ctx, t);
+          // 2. 夕阳
+          sun.update(t);
+          sun.draw(ctx);
+          // 3. 云彩
+          clouds.forEach(c => { c.update(t); c.draw(ctx); });
+          // 4. 星星
+          skyStars.forEach(s => { s.update(t); s.draw(ctx); });
+          // 5. 地平线
+          drawHorizon(ctx, t);
+          // 6. 水面渐变
+          drawWater(ctx, t);
+          // 7. 水波纹
+          ripples.forEach(r => { r.update(t); r.draw(ctx, t); });
+          // 8. 水面倒影
+          drawReflections(ctx, t);
+          // 9. 光斑
+          lightSpots.forEach(s => { s.update(t); s.draw(ctx, t); });
+          // 10. 萤火虫
+          fireflies.forEach(f => { f.update(t); f.draw(ctx, t); });
+          // 11. 中心大星
+          centerStar.update(t);
+          centerStar.draw(ctx);
+
+          animFrame = requestAnimationFrame(animate);
+        }
+
+        animate();
+        return () => cancelAnimationFrame(animFrame);
+      }, [width, height]);
+
+      return <canvas ref={canvasRef} />;
+    });
+  </script>
+
+  <!-- ─── CountdownRing Component ─── -->
+  <script type="text/babel">
+    // 表盘倒计时 — 根据已流逝时间动态计算进度弧
+    // totalDays: 总周期天数 | remainingDays: 剩余天数
+    // 进度弧 = 已流逝时间 / 总周期（顺时针累积，接近满圆 = 即将开启）
+    // 指示点独立匀速旋转（与进度无关），增加页面生命力
+    // 动画标注: 刻度 + 进度弧 → L1 | 指示点旋转 → L1 全平台可实现
+    function CountdownRing({ totalDays, remainingDays }) {
+      const elapsed = totalDays - remainingDays;
+      const progress = Math.max(0, Math.min(1, elapsed / totalDays));
+      const circumference = 2 * Math.PI * 44; // ~276.46
+      const dashOffset = circumference * (1 - progress);
+
+      return (
+        <div className="countdown-ring-wrap">
+          <svg className="countdown-ring" viewBox="0 0 120 120" width="120" height="120">
+            {/* 刻度标记 */}
+            {Array.from({ length: 60 }).map((_, i) => {
+              const angle = (i * 6 - 90) * Math.PI / 180;
+              const isMajor = i % 5 === 0;
+              const r1 = isMajor ? 48 : 50;
+              const r2 = 52;
+              return (
+                <line
+                  key={i}
+                  x1={60 + r1 * Math.cos(angle)}
+                  y1={60 + r1 * Math.sin(angle)}
+                  x2={60 + r2 * Math.cos(angle)}
+                  y2={60 + r2 * Math.sin(angle)}
+                  stroke={isMajor ? '#D4A017' : '#E8D5B0'}
+                  strokeWidth={isMajor ? 1.5 : 0.5}
+                  opacity={isMajor ? 0.7 : 0.3}
+                />
+              );
+            })}
+            {/* 进度弧 — 已流逝时间占比 */}
+            <circle
+              cx="60" cy="60" r="44"
+              fill="none"
+              stroke="url(#countdownGrad)"
+              strokeWidth="2.5"
+              strokeDasharray={circumference}
+              strokeDashoffset={dashOffset}
+              strokeLinecap="round"
+              transform="rotate(-90 60 60)"
+            />
+            {/* 匀速旋转指示点 — 与进度无关 */}
+            <g className="countdown-ring-indicator">
+              <circle
+                cx="60" cy="16" r="3.5"
+                fill="#FFD700"
+                filter="url(#glow)"
+              />
+            </g>
+            <defs>
+              <linearGradient id="countdownGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#FFD700" />
+                <stop offset="100%" stopColor="#B8860B" />
+              </linearGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="2.5" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+          </svg>
+          <div className="countdown-ring-center">
+            <span className="countdown-number">{remainingDays}</span>
+          </div>
+        </div>
+      );
+    }
+  </script>
+
+  <!-- ─── RulesSection Component ─── -->
+  <script type="text/babel">
+    // 富文本规则区 — 不做结构化解析，直接渲染原始内容
+    // 默认展开，可折叠收起（PRD: 可折叠，默认收起 → 此处为原型展示改为默认展开）
+    function RulesSection() {
+      const [expanded, setExpanded] = React.useState(true);
+
+      // 模拟后端富文本内容（实际为接口返回的 HTML 字符串）
+      const richTextContent = `
+        <p>1. 活动时间：2026年6月1日 - 2026年6月30日</p>
+        <p>2. 购买免佣卡分享资格后，可通过分享链接邀请好友参与</p>
+        <p>3. 每成功邀请1位好友购买，即可获得阶梯奖励</p>
+        <p>4. 邀请人数越多，奖励越丰厚</p>
+        <p>5. 最终奖励需邀请满5人，奖励将在活动结束后3个工作日内发放</p>
+      `;
+
+      return (
+        <div className="rules-section">
+          <div className="rules-toggle" onClick={() => setExpanded(!expanded)}>
+            <svg className="rules-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <span className="rules-toggle-text">活动规则</span>
+            <svg
+              className={`rules-toggle-arrow ${expanded ? 'rotated' : ''}`}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </div>
+
+          <div className={`rules-content ${expanded ? 'expanded' : ''}`}>
+            {expanded && (
+              <div className="rules-card">
+                <div
+                  className="rules-rich-text"
+                  dangerouslySetInnerHTML={{ __html: richTextContent }}
+                />
+                <div className="rules-footer-line" />
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+  </script>
+
+  <!-- ─── App Component ─── -->
+  <script type="text/babel">
+    const App = () => {
+      React.useEffect(() => {
+        initPageEntrance();
+      }, []);
+
+      return (
+        <MiniAppFrame time="9:41" battery={85} contentBg="transparent">
+          <div className="page-container">
+
+            {/* ── Top Bar (参与记录 only) ─── */}
+            <div className="top-bar" style={{ justifyContent: 'flex-end' }}>
+              <div className="record-button" onClick={()=>{ window.location.href = '../09-participation-record.html?from=preview'; }}>
+                <svg className="record-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span className="record-text">参与记录</span>
+              </div>
+            </div>
+
+            {/* ─── Title ─── */}
+            <div className="page-title">
+              <h1>
+                夏日派对
+                <span style={{
+                  display: 'inline-block',
+                  width: 6, height: 6,
+                  margin: '0 10px',
+                  background: '#D4A017',
+                  borderRadius: '50%',
+                  verticalAlign: 'middle',
+                }} />
+                一起狂欢
+              </h1>
+              <div className="subtitle">SUMMER CARNIVAL</div>
+            </div>
+
+            {/* ─── Poster Card ─── */}
+            <div className="poster-card">
+              <div className="poster-ribbon" />
+
+              <div className="poster-canvas-wrap">
+                <PosterCanvas width={361} height={220} />
+                <div className="poster-overlay">
+                  <div className="label-wave">
+                    {'Coming Soon'.split('').map((char, i) => (
+                      <span key={i} className={char === ' ' ? 'wave-space' : 'wave-letter'} style={{ animationDelay: `${i * 0.08}s` }}>
+                        {char === ' ' ? ' ' : char}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="poster-bow">
+                <svg viewBox="0 0 361 54" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                  {/* ═══════════════════════════════════════
+                       丝带主体 — 从左到右的缎带
+                       用双 path 模拟带宽度的丝带：
+                       底层=暗色带身，上层=亮色高光边缘
+                     ═══════════════════════════════════════ */}
+
+                  {/* 丝带带身（宽路径，暗金底色） */}
+                  <path d="M0 14C50 12 110 24 180.5 28C251 24 311 12 361 14"
+                    stroke="#A87B2E" strokeWidth="7" strokeLinecap="round"
+                    fill="none" opacity="0.3" />
+
+                  {/* 丝带表面（金色主色） */}
+                  <path d="M0 14C50 12 110 24 180.5 28C251 24 311 12 361 14"
+                    stroke="url(#ribbonBodyGrad)" strokeWidth="5" strokeLinecap="round"
+                    fill="none" opacity="0.55" />
+
+                  {/* 丝带上边缘高光 */}
+                  <path d="M0 14C50 12 110 24 180.5 28C251 24 311 12 361 14"
+                    stroke="url(#ribbonEdgeHighlight)" strokeWidth="1.2" strokeLinecap="round"
+                    fill="none" opacity="0.6" />
+
+                  {/* 丝带下边缘暗线（模拟厚度） */}
+                  <path d="M0 14C50 12 110 24 180.5 28C251 24 311 12 361 14"
+                    stroke="#8B6508" strokeWidth="0.8" strokeLinecap="round"
+                    fill="none" opacity="0.2" />
+
+                  {/* 丝带左侧端点切角装饰 */}
+                  <path d="M0 10.5L6 14L0 17.5" fill="#D4A017" opacity="0.4" />
+
+                  {/* 丝带右侧端点切角装饰 */}
+                  <path d="M361 10.5L355 14L361 17.5" fill="#D4A017" opacity="0.4" />
+
+                  {/* ═══════════════════════════════════════
+                       蝴蝶结 — 简洁环结
+                     ═══════════════════════════════════════ */}
+
+                  {/* 左环 — 内外环结构，逆时针旋转 */}
+                  <g transform="translate(161, 36) rotate(-30)">
+                    {/* 外环 */}
+                    <ellipse cx="0" cy="0" rx="22" ry="10"
+                      fill="#D4983A" />
+                    {/* 内环折痕 */}
+                    <ellipse cx="0" cy="0" rx="10" ry="5"
+                      fill="none" stroke="#A87B2E" strokeWidth="1" opacity="0.4" />
+                  </g>
+
+                  {/* 右环 — 内外环结构，顺时针旋转 */}
+                  <g transform="translate(200, 36) rotate(30)">
+                    {/* 外环 */}
+                    <ellipse cx="0" cy="0" rx="22" ry="10"
+                      fill="#D4983A" />
+                    {/* 内环折痕 */}
+                    <ellipse cx="0" cy="0" rx="10" ry="5"
+                      fill="none" stroke="#A87B2E" strokeWidth="1" opacity="0.4" />
+                  </g>
+
+                  {/* 左尾 */}
+                  <line x1="175" y1="40" x2="168" y2="58"
+                    stroke="#B8860B" strokeWidth="1.5" strokeLinecap="round"
+                    opacity="0.55" />
+
+                  {/* 右尾 */}
+                  <line x1="186" y1="40" x2="193" y2="58"
+                    stroke="#B8860B" strokeWidth="1.5" strokeLinecap="round"
+                    opacity="0.55" />
+
+                  {/* 中心结 */}
+                  <circle cx="180.5" cy="32" r="5"
+                    fill="#D4A017" opacity="0.9" />
+                  <circle cx="180.5" cy="31" r="2"
+                    fill="#FFF8F0" opacity="0.4" />
+
+                  <defs>
+                    {/* 丝带主体渐变：左→中→右 */}
+                    <linearGradient id="ribbonBodyGrad" x1="0" y1="0" x2="361" y2="0">
+                      <stop offset="0%" stopColor="#D4A017" />
+                      <stop offset="25%" stopColor="#B8860B" />
+                      <stop offset="50%" stopColor="#FFD700" />
+                      <stop offset="75%" stopColor="#B8860B" />
+                      <stop offset="100%" stopColor="#D4A017" />
+                    </linearGradient>
+
+                    {/* 丝带边缘高光：中间亮两端暗 */}
+                    <linearGradient id="ribbonEdgeHighlight" x1="0" y1="0" x2="361" y2="0">
+                      <stop offset="0%" stopColor="#D4A017" stopOpacity="0" />
+                      <stop offset="20%" stopColor="#FFD700" stopOpacity="0.6" />
+                      <stop offset="50%" stopColor="#FFF0D9" stopOpacity="0.8" />
+                      <stop offset="80%" stopColor="#FFD700" stopOpacity="0.6" />
+                      <stop offset="100%" stopColor="#D4A017" stopOpacity="0" />
+                    </linearGradient>
+
+                  </defs>
+                </svg>
+              </div>
+
+              <div className="countdown-section">
+                <div className="countdown-label">
+                  距离开始还剩
+                  <span style={{
+                    display: 'inline-block',
+                    width: 4, height: 4,
+                    margin: '0 6px',
+                    background: '#D4A017',
+                    borderRadius: '50%',
+                    verticalAlign: 'middle',
+                    opacity: 0.5,
+                  }} />
+                  天
+                </div>
+
+                {/* 环形表盘倒计时 — totalDays=12, remainingDays=4 → 弧长=8/12=2/3 */}
+                <CountdownRing totalDays={12} remainingDays={4} />
+
+                <div className="countdown-hint">敬请期待，做好准备</div>
+              </div>
+            </div>
+
+            {/* ─── Rules (Collapsible Rich Text) ─── */}
+            <RulesSection />
+
+          </div>
+        </MiniAppFrame>
+      );
+    };
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

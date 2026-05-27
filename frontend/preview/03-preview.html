@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page 3 · 活动主页-预告期</title>
+<style>
+  ::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
+  * { -ms-overflow-style: none !important; scrollbar-width: none !important; }
+</style>
+<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+// ═══════════════════════════════════════════
+// MiniAppFrame (inlined from assets/miniapp_frame.jsx)
+// ═══════════════════════════════════════════
+const miniappFrameStyles = {
+  wrapper: {
+    display:'inline-block',padding:3,background:'#1a1a1a',
+    borderRadius:50,boxShadow:'0 8px 40px rgba(0,0,0,0.18)',position:'relative',
+  },
+  screen: {
+    position:'relative',borderRadius:48,overflow:'hidden',background:'#fff',
+  },
+  statusBar: {
+    position:'absolute',top:0,left:0,right:0,height:54,
+    display:'flex',alignItems:'center',justifyContent:'space-between',
+    padding:'0 32px 0 32px',fontSize:16,fontWeight:600,
+    fontFamily:'-apple-system, "SF Pro Text", sans-serif',
+    zIndex:20,pointerEvents:'none',
+  },
+  dynamicIsland: {
+    position:'absolute',top:12,left:'50%',transform:'translateX(-50%)',
+    width:124,height:36,background:'#000',borderRadius:999,zIndex:30,
+  },
+  statusIcons: {display:'flex',alignItems:'center',gap:6},
+  signalIcon: {display:'flex',alignItems:'flex-end',gap:2,height:12},
+  signalBar: {width:3,background:'currentColor',borderRadius:1},
+  batteryIcon: {
+    width:26,height:12,border:'1.5px solid currentColor',borderRadius:3,
+    padding:1,position:'relative',opacity:0.8,
+  },
+  batteryCap: {
+    position:'absolute',top:3,right:-3,width:2,height:6,
+    background:'currentColor',borderRadius:'0 1px 1px 0',
+  },
+  wechatTopBar: {
+    position:'absolute',top:50,left:0,right:0,height:36,
+    display:'flex',alignItems:'center',justifyContent:'flex-end',
+    padding:'0 15px',zIndex:15,background:'transparent',
+  },
+  wechatPill: {
+    display:'flex',alignItems:'center',background:'rgba(255,255,255,0.9)',
+    borderRadius:20,padding:'6px 4px',backdropFilter:'blur(10px)',
+    boxShadow:'0 1px 4px rgba(0,0,0,0.06)',
+  },
+  wechatMore: {
+    width:28,height:22,display:'flex',alignItems:'center',
+    justifyContent:'center',cursor:'pointer',
+  },
+  wechatDivider: {
+    width:1,height:14,background:'rgba(0,0,0,0.08)',flexShrink:0,
+  },
+  wechatClose: {
+    width:28,height:22,display:'flex',alignItems:'center',
+    justifyContent:'center',cursor:'pointer',
+  },
+  content: {
+    position:'absolute',top:86,left:0,right:0,bottom:34,
+    overflowY:'auto',overflowX:'hidden',
+  },
+  homeIndicator: {
+    position:'absolute',bottom:10,left:'50%',transform:'translateX(-50%)',
+    width:140,height:5,background:'rgba(0,0,0,0.3)',borderRadius:999,zIndex:10,
+  },
+};
+
+function MiniAppFrame({
+  children,width=393,height=852,time='9:41',battery=100,
+  darkMode=false,contentBg='#f5f5f5',
+}) {
+  const textColor = darkMode ? '#fff' : '#000';
+
+  return (
+    <div style={miniappFrameStyles.wrapper}>
+      <div style={{...miniappFrameStyles.screen,width,height,background:darkMode?'#000':'#fff'}}>
+        <div style={{...miniappFrameStyles.statusBar,color:textColor}}>
+          <span>{time}</span>
+          <div style={miniappFrameStyles.statusIcons}>
+            <div style={miniappFrameStyles.signalIcon}>
+              <div style={{...miniappFrameStyles.signalBar,height:4}}/>
+              <div style={{...miniappFrameStyles.signalBar,height:6}}/>
+              <div style={{...miniappFrameStyles.signalBar,height:9}}/>
+              <div style={{...miniappFrameStyles.signalBar,height:11}}/>
+            </div>
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="none" style={{color:textColor}}>
+              <path d="M8 11.5a1 1 0 100-2 1 1 0 000 2z" fill="currentColor"/>
+              <path d="M3 7.5a7 7 0 0110 0" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
+              <path d="M1 4.5a11 11 0 0114 0" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" opacity="0.7"/>
+            </svg>
+            <div style={miniappFrameStyles.batteryIcon}>
+              <div style={{width:`${battery}%`,height:'100%',background:'currentColor',borderRadius:1,opacity:0.9}}/>
+              <div style={miniappFrameStyles.batteryCap}/>
+            </div>
+          </div>
+        </div>
+        <div style={miniappFrameStyles.dynamicIsland}/>
+        <div style={miniappFrameStyles.wechatTopBar}>
+          <div style={miniappFrameStyles.wechatPill}>
+            <div style={miniappFrameStyles.wechatMore}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="6" cy="12" r="2" fill="#333"/>
+                <circle cx="12" cy="12" r="2" fill="#333"/>
+                <circle cx="18" cy="12" r="2" fill="#333"/>
+              </svg>
+            </div>
+            <div style={miniappFrameStyles.wechatDivider}/>
+            <div style={miniappFrameStyles.wechatClose}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.2">
+                <circle cx="12" cy="12" r="8"/>
+                <circle cx="12" cy="12" r="3.5" fill="#333" stroke="none"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div style={{...miniappFrameStyles.content,background:contentBg}}>
+          {children}
+        </div>
+        <div style={{...miniappFrameStyles.homeIndicator,...(darkMode?{background:'rgba(255,255,255,0.5)'}:{})}}/>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// Page 3 · 活动主页 - 预告期（状态A）
+// ═══════════════════════════════════════════
+const App = () => (
+  <MiniAppFrame time="9:41" battery={85} contentBg="#FFFBF0">
+    <div style={{padding:'8px 16px 80px',minHeight:'100%',position:'relative'}}>
+
+      {/* Record Entry */}
+      <div style={{position:'absolute',top:8,right:16,zIndex:20,cursor:'pointer'}}>
+        <span style={{fontSize:13,color:'#FF9500',fontWeight:600}}>参与记录 ›</span>
+      </div>
+
+      {/* Title */}
+      <div style={{textAlign:'center',paddingTop:12,marginBottom:20}}>
+        <div style={{fontSize:24,fontWeight:700,color:'#333'}}>权益卡裂变邀请</div>
+      </div>
+
+      {/* Poster - Gold framed invitation card */}
+      <div style={{
+        border:'1px solid #FFD700',borderRadius:12,overflow:'hidden',
+        background:'#FFFBF5',boxShadow:'0 4px 20px rgba(255,215,0,0.1)',position:'relative',marginBottom:24
+      }}>
+        {/* Corner decorations */}
+        <svg style={{position:'absolute',top:8,left:8,width:24,height:24}} viewBox="0 0 24 24">
+          <path d="M0 0 L24 0 L24 3 L3 3 L3 24 L0 24 Z" fill="#FFD700" opacity="0.6"/>
+        </svg>
+        <svg style={{position:'absolute',top:8,right:8,width:24,height:24}} viewBox="0 0 24 24">
+          <path d="M24 0 L0 0 L0 3 L21 3 L21 24 L24 24 Z" fill="#FFD700" opacity="0.6"/>
+        </svg>
+        <svg style={{position:'absolute',bottom:8,left:8,width:24,height:24}} viewBox="0 0 24 24">
+          <path d="M0 24 L24 24 L24 21 L3 21 L3 0 L0 0 Z" fill="#FFD700" opacity="0.6"/>
+        </svg>
+        <svg style={{position:'absolute',bottom:8,right:8,width:24,height:24}} viewBox="0 0 24 24">
+          <path d="M24 24 L0 24 L0 21 L21 21 L21 0 L24 0 Z" fill="#FFD700" opacity="0.6"/>
+        </svg>
+
+        {/* Poster visual area */}
+        <div style={{
+          margin:16,borderRadius:8,overflow:'hidden',
+          background:'linear-gradient(180deg, #FFF8F0 0%, #FFF0E0 100%)',
+          minHeight:180,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',
+          border:'1px solid #FFE8D6'
+        }}>
+          <div style={{fontSize:14,color:'#A8856A',fontWeight:500,letterSpacing:'2px',marginBottom:8}}>COMING SOON</div>
+          <div style={{fontSize:48,fontWeight:900,color:'#D4A574',lineHeight:1}}>?</div>
+          <div style={{fontSize:13,color:'#C8956A',marginTop:12,fontWeight:500}}>敬请期待</div>
+        </div>
+
+        {/* Countdown */}
+        <div style={{textAlign:'center',padding:'8px 0 20px',borderTop:'1px solid #FFD700',background:'#FFFBF5'}}>
+          <div style={{display:'flex',alignItems:'baseline',justifyContent:'center',gap:8}}>
+            <span style={{fontSize:16,color:'#999',fontWeight:400}}>还有</span>
+            <span style={{fontSize:56,fontWeight:900,color:'#FF6B00',lineHeight:1,textShadow:'0 1px 2px rgba(255,107,0,0.15)'}}>15</span>
+            <span style={{fontSize:16,color:'#999',fontWeight:400}}>天</span>
+          </div>
+          <div style={{fontSize:11,color:'#C8956A',marginTop:6,letterSpacing:'1px',textTransform:'uppercase'}}>AFTER THE EVENT OPENS</div>
+        </div>
+      </div>
+
+      {/* Rules - 裸渲染 + 金线过渡 */}
+      <div style={{marginTop:8}}>
+        <div style={{height:1,background:'linear-gradient(90deg, transparent, #FFD700, transparent)',marginBottom:16}}/>
+        <div style={{fontSize:11,color:'#bbb',letterSpacing:'2px',textAlign:'center',marginBottom:12,textTransform:'uppercase'}}>活动规则</div>
+        <div style={{fontSize:14,color:'#555',lineHeight:1.8,padding:'0 8px'}}>
+          <p style={{margin:'0 0 8px'}}>1. 活动时间：2024年6月1日 - 2024年6月30日</p>
+          <p style={{margin:'0 0 8px'}}>2. 购买免佣卡分享资格后，可通过分享链接邀请好友参与</p>
+          <p style={{margin:'0 0 8px'}}>3. 每成功邀请1位好友购买，即可获得阶梯奖励</p>
+          <p style={{margin:'0 0 8px'}}>4. 邀请人数越多，奖励越丰厚</p>
+          <p style={{margin:0}}>5. 最终奖励需邀请满5人，奖励将在活动结束后3个工作日内发放</p>
+        </div>
+      </div>
+    </div>
+  </MiniAppFrame>
+);
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

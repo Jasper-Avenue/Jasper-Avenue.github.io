@@ -1,0 +1,531 @@
+/* ══════════════════════════════════════════════
+   Design Tokens — 金色邀请函
+   ══════════════════════════════════════════════ */
+:root {
+  /* 色彩系统 */
+  --gold-primary: #D4A017;
+  --gold-light: #F0D68A;
+  --gold-bright: #FFD700;
+  --gold-deep: #B8860B;
+  --orange-accent: #FF6B35;
+  --orange-soft: #FF8C5A;
+  --cream-bg: #FFF8F0;
+  --cream-warm: #FFF3E6;
+  --cream-card: #FFFDF7;
+  --brown-dark: #2C1810;
+  --brown-mid: #6B4E3D;
+  --brown-light: #A8856A;
+  --brown-faint: #D4C4B0;
+  --text-primary: #2C1810;
+  --text-secondary: #6B4E3D;
+  --text-tertiary: #A8856A;
+  --text-disabled: #C8B8A0;
+
+  /* 字体 */
+  --font-serif: 'Noto Serif SC', 'Songti SC', serif;
+  --font-sans: 'Noto Sans SC', 'PingFang SC', -apple-system, sans-serif;
+
+  /* 间距 */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-2xl: 24px;
+  --space-3xl: 32px;
+
+  /* 圆角 */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 999px;
+
+  /* 阴影 */
+  --shadow-sm: 0 1px 3px rgba(44,24,16,0.06);
+  --shadow-md: 0 4px 12px rgba(44,24,16,0.08);
+  --shadow-lg: 0 8px 30px rgba(44,24,16,0.12);
+  --shadow-gold: 0 4px 20px rgba(212,160,23,0.15);
+  --shadow-glow: 0 0 20px rgba(212,160,23,0.3);
+
+  /* 动效 */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --duration-slower: 800ms;
+}
+
+/* ══════════════════════════════════════════════
+   Reset & Base
+   ═══════════════════════════════════════════════ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
+* { -ms-overflow-style: none !important; scrollbar-width: none !important; }
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #e8e4de;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════════
+   Page Container
+   ═══════════════════════════════════════════════ */
+.page-container {
+  padding: 8px 16px 80px;
+  min-height: 100%;
+  position: relative;
+  background: linear-gradient(180deg, var(--cream-bg) 0%, var(--cream-warm) 100%);
+}
+
+/* Page entrance animation */
+.page-container > * {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.page-container.page-entered > * {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity var(--duration-slower) var(--ease-out-expo),
+              transform var(--duration-slower) var(--ease-out-expo);
+}
+
+.page-container.page-entered > :nth-child(1) { transition-delay: 100ms; }
+.page-container.page-entered > :nth-child(2) { transition-delay: 200ms; }
+.page-container.page-entered > :nth-child(3) { transition-delay: 300ms; }
+.page-container.page-entered > :nth-child(4) { transition-delay: 400ms; }
+
+/* ═══════════════════════════════════════════════
+   Top Bar — 参与记录（右侧）
+   ═══════════════════════════════════════════════ */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-top: 4px;
+  margin-bottom: var(--space-xl);
+}
+
+.record-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+  background: linear-gradient(135deg, rgba(212,160,23,0.12) 0%, rgba(212,160,23,0.06) 100%);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(212,160,23,0.2);
+}
+
+.record-button:active {
+  transform: scale(0.95);
+}
+
+.record-icon {
+  width: 15px;
+  height: 15px;
+  color: var(--gold-deep);
+}
+
+.record-text {
+  font-size: 12px;
+  color: var(--gold-deep);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* ═══════════════════════════════════════════════
+   Page Title
+   ══════════════════════════════════════════════ */
+.page-title {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.page-title h1 {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, var(--brown-dark) 0%, var(--gold-deep) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.page-title .subtitle {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+/* ═══════════════════════════════════════════════
+   Poster Card — 邀请函主体
+   ═══════════════════════════════════════════════ */
+.poster-card {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--cream-card);
+  box-shadow: var(--shadow-lg), var(--shadow-gold);
+  margin-bottom: var(--space-2xl);
+  border: 1px solid rgba(212,160,23,0.15);
+}
+
+/* 金色丝带装饰 - 顶部 */
+.poster-ribbon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg,
+    var(--gold-deep),
+    var(--gold-bright),
+    var(--gold-deep),
+    var(--gold-bright),
+    var(--gold-deep)
+  );
+  background-size: 200% 100%;
+  animation: ribbon-shimmer 3s ease-in-out infinite;
+  z-index: 2;
+}
+
+@keyframes ribbon-shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* 海报 Canvas 区域 */
+.poster-canvas-wrap {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: linear-gradient(180deg, #FFF5E6 0%, #FFE8CC 50%, #FFF0D9 100%);
+}
+
+.poster-canvas-wrap canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* 海报中心文字叠加 — 位于水面区域 */
+.poster-overlay {
+  position: absolute;
+  top: 62%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* 星星图标 — 弹簧入场 */
+.icon-wrap.icon-entrance {
+  animation: icon-spring 0.8s var(--ease-out-back) 0.3s both;
+}
+
+@keyframes icon-spring {
+  0% { transform: scale(0.5); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.poster-overlay .icon-wrap {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 10px;
+  background: rgba(255,255,255,0.7);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 12px rgba(212,160,23,0.2);
+  backdrop-filter: blur(4px);
+}
+
+.poster-overlay .icon-wrap svg {
+  width: 32px;
+  height: 32px;
+  color: var(--gold-deep);
+}
+
+/* "Coming Soon" 波浪跳动 */
+.label-wave {
+  font-size: 12px;
+  color: #FFF8F0;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  opacity: 1;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  text-shadow: 0 1px 6px rgba(168,112,48,0.8), 0 0 12px rgba(255,215,0,0.4), 0 2px 3px rgba(0,0,0,0.15);
+}
+
+.wave-letter {
+  display: inline-block;
+  animation: letter-wave 1.2s var(--ease-out-back) infinite;
+}
+
+@keyframes letter-wave {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.85;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+.wave-space {
+  display: inline-block;
+  width: 0.3em;
+}
+
+/* 丝带蝴蝶结 — 呼吸微浮动 */
+.poster-bow {
+  text-align: center;
+  padding: var(--space-sm) 0 0;
+  position: relative;
+  width: 100%;
+}
+
+.poster-bow svg {
+  width: 100%;
+  height: 54px;
+  animation: bow-shimmer 3s ease-in-out infinite,
+             bow-breathe 4s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(212,160,23,0.12));
+}
+
+@keyframes bow-shimmer {
+  0%, 100% { opacity: 0.85; filter: drop-shadow(0 2px 4px rgba(212,160,23,0.12)) brightness(1); }
+  50% { opacity: 1; filter: drop-shadow(0 2px 4px rgba(212,160,23,0.12)) brightness(1.06); }
+}
+
+@keyframes bow-breathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+/* 倒计时区域 */
+.countdown-section {
+  text-align: center;
+  padding: var(--space-md) var(--space-lg) var(--space-xl);
+  border-top: 1px solid rgba(212,160,23,0.12);
+  background: linear-gradient(180deg, rgba(255,248,240,0.5) 0%, rgba(255,253,247,0.9) 100%);
+}
+
+.countdown-label {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  letter-spacing: 1px;
+  margin-bottom: var(--space-lg);
+  font-weight: 500;
+}
+
+/* 环形表盘容器 */
+.countdown-ring-wrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+}
+
+/* SVG 环形 */
+.countdown-ring {
+  display: block;
+}
+
+/* 指示点匀速旋转 — 与进度无关，像钟表秒针 */
+.countdown-ring-indicator {
+  transform-origin: 60px 60px;
+  animation: indicator-spin 8s linear infinite;
+}
+
+@keyframes indicator-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 中心数字 */
+.countdown-ring-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.countdown-number {
+  font-family: var(--font-serif);
+  font-size: 44px;
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold-deep) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.countdown-hint {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: var(--space-sm);
+  opacity: 0.7;
+}
+
+/* ═══════════════════════════════════════════════
+   Rules Section — 富文本可折叠规则区
+   ═══════════════════════════════════════════════ */
+.rules-section {
+  margin-top: var(--space-xl);
+  padding-bottom: var(--space-3xl);
+}
+
+/* 折叠触发器 */
+.rules-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) 0;
+  cursor: pointer;
+  transition: opacity var(--duration-fast) ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.rules-toggle:active {
+  opacity: 0.6;
+}
+
+.rules-toggle-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--gold-primary);
+  opacity: 0.5;
+}
+
+.rules-toggle-text {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  letter-spacing: 3px;
+  font-weight: 500;
+}
+
+.rules-toggle-arrow {
+  width: 16px;
+  height: 16px;
+  color: var(--text-tertiary);
+  opacity: 0.4;
+  transition: transform var(--duration-normal) var(--ease-out-expo);
+}
+
+.rules-toggle-arrow.rotated {
+  transform: rotate(180deg);
+}
+
+/* 内容容器 — 折叠时高度为 0 */
+.rules-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--duration-slow) var(--ease-out-expo);
+}
+
+.rules-content.expanded {
+  max-height: 600px; /* 足够容纳富文本内容 */
+}
+
+/* 富文本内容卡片 */
+.rules-card {
+  background: var(--cream-card);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(212,160,23,0.08);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+/* 富文本排版 */
+.rules-rich-text {
+  padding: var(--space-lg) var(--space-xl);
+}
+
+.rules-rich-text p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.85;
+  margin: 0;
+  padding: var(--space-sm) 0;
+  word-break: break-word;
+}
+
+/* 段落间分隔线 */
+.rules-rich-text p + p {
+  border-top: 1px solid rgba(212,160,23,0.06);
+  padding-top: var(--space-md);
+}
+
+/* 富文本中的数字/编号保持原样 */
+.rules-rich-text strong,
+.rules-rich-text b {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* 底部装饰线 */
+.rules-footer-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--gold-light) 50%, transparent 100%);
+  opacity: 0.4;
+  margin-top: var(--space-md);
+}
+
+/* ═══════════════════════════════════════════════
+   Bottom Bar — 底部固定操作栏
+   ══════════════════════════════════════════════ */
+.bottom-bar {
+  position: absolute;
+  bottom: 34px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  gap: var(--space-md);
+  z-index: 10;
+}
+
+/* ═══════════════════════════════════════════════
+   动画标注
+   ═══════════════════════════════════════════════ */
+/*
+  1. 页面入场（stagger fade-in）→ L1 全平台可实现
+  2. 丝带流光（shimmer）→ L2 CSS keyframes，小程序需适配
+  3. 倒计时环指示点旋转 → L1 CSS keyframes
+  4. Canvas 粒子动画 → L3 仅 WEB，交付时标注"开发需替换为静态图或原生方案"
+  5. 规则折叠展开 → L2 max-height transition，小程序需用 onPageScroll
+  6. 按钮 active 缩放 → L1 CSS transform
+  7. "Coming Soon" 字母波浪跳动 → L1 CSS keyframes，全平台可实现
+  8. 星星图标弹簧入场 → L1 CSS transform animation
+  9. 丝带蝴蝶结呼吸微浮动 → L2 CSS keyframes
+*/

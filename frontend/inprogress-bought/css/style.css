@@ -1,0 +1,393 @@
+/* ═══════════════════════════════════════════
+   小助手 · 进行中-已购买 — 样式
+   基于 inprogress-unbought Takram 风格，新增邀请记录卡片 + 纸屑
+   ═══════════════════════════════════════════ */
+
+/* Reset */
+::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
+* { -ms-overflow-style: none !important; scrollbar-width: none !important; }
+
+/* 背景水彩色块 — 活动氛围 */
+.ambient-blob {
+  position: absolute; border-radius: 50%; pointer-events: none; z-index: 0;
+  will-change: transform;
+}
+.ambient-blob--warm {
+  background: radial-gradient(ellipse at center, rgba(255,183,77,0.06) 0%, transparent 70%);
+  animation: blobDrift1 80s ease-in-out infinite;
+}
+.ambient-blob--green {
+  background: radial-gradient(ellipse at center, rgba(107,143,113,0.05) 0%, transparent 70%);
+  animation: blobDrift2 90s ease-in-out infinite;
+}
+.ambient-blob--soft {
+  background: radial-gradient(ellipse at center, rgba(232,168,124,0.04) 0%, transparent 70%);
+  animation: blobDrift3 100s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════ */
+
+html, body {
+  margin: 0; padding: 0;
+  background: #e8e8e8;
+  display: flex; justify-content: center; align-items: flex-start;
+  min-height: 100vh; padding: 40px 20px;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+}
+
+/* ═══════════════════════════════════════════
+   @keyframes
+   ═══════════════════════════════════════════ */
+
+@keyframes breathe {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+@keyframes heartbeat {
+  0%,100% { transform: scale(1); filter: drop-shadow(0 1px 2px rgba(0,0,0,0.06)); }
+  50%     { transform: scale(1.02); filter: drop-shadow(0 2px 6px rgba(0,0,0,0.1)); }
+}
+
+@keyframes colonFloat {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-1.5px); }
+}
+
+@keyframes labelDrift {
+  0%,100% { opacity: 0.5; }
+  50%     { opacity: 0.7; }
+}
+
+@keyframes contourSpin1 {
+  0%   { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@keyframes contourSpin2 {
+  0%   { transform: translate(-50%, -50%) rotate(360deg); }
+  100% { transform: translate(-50%, -50%) rotate(0deg); }
+}
+@keyframes contourSpin3 {
+  0%   { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(-360deg); }
+}
+
+@keyframes footerFadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ctaFloat {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ctaSweep {
+  0%   { background-position: -100% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes ctaSweepFast {
+  0%   { background-position: -100% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes ctaPulseRing {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(160,122,14,0.25); }
+  50% { box-shadow: 0 0 0 6px rgba(160,122,14,0); }
+}
+
+@keyframes tierHighlight {
+  0%,100% { opacity: 0.6; }
+  50%     { opacity: 1; }
+}
+
+/* 水彩色块漂移 */
+@keyframes blobDrift1 {
+  0%,100% { transform: translate(0, 0) scale(1); }
+  50%     { transform: translate(15px, 10px) scale(1.05); }
+}
+@keyframes blobDrift2 {
+  0%,100% { transform: translate(0, 0) scale(1); }
+  50%     { transform: translate(-12px, -8px) scale(1.08); }
+}
+@keyframes blobDrift3 {
+  0%,100% { transform: translate(0, 0) scale(1); }
+  50%     { transform: translate(8px, -12px) scale(0.95); }
+}
+
+/* ═══════════════════════════════════════════
+   获奖进度 · 蓄势·蓄光 (复用 unbought)
+   ═══════════════════════════════════════════ */
+
+.progress-glow-wrap {
+  margin: 0 20px 16px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
+}
+.progress-glow-wrap.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.progress-glow-card {
+  position: relative;
+  padding: 18px 18px 16px;
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.3) 100%);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.55);
+  box-shadow:
+    0 0 24px rgba(255,183,77,0.04),
+    0 4px 20px rgba(139,115,85,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.7);
+  animation: cardBreathe 4s ease-in-out infinite;
+  overflow: hidden;
+}
+
+@keyframes cardBreathe {
+  0%,100% {
+    box-shadow:
+      0 0 24px rgba(255,183,77,0.04),
+      0 4px 20px rgba(139,115,85,0.06),
+      inset 0 1px 0 rgba(255,255,255,0.7);
+  }
+  50% {
+    box-shadow:
+      0 0 32px rgba(255,183,77,0.08),
+      0 4px 24px rgba(139,115,85,0.1),
+      inset 0 1px 0 rgba(255,255,255,0.7),
+      0 0 48px rgba(255,183,77,0.03);
+  }
+}
+
+.progress-glow-motive {
+  font-size: 12px;
+  color: #8B7355;
+  font-weight: 400;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+}
+.progress-glow-motive em {
+  font-style: normal;
+  color: #6B8F71;
+  font-weight: 600;
+}
+
+/* 首档奖励行 — 脉冲点 + 标签 + 金额 */
+.progress-glow-reward {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.progress-glow-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FFB74D;
+  box-shadow: 0 0 8px rgba(255,183,77,0.5);
+  animation: dotBreathe 2.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes dotBreathe {
+  0%,100% { opacity: 0.6; transform: scale(1); box-shadow: 0 0 8px rgba(255,183,77,0.5); }
+  50%     { opacity: 1;   transform: scale(1.4); box-shadow: 0 0 14px rgba(255,183,77,0.7); }
+}
+
+.progress-glow-label {
+  font-size: 10px;
+  color: #A8A098;
+  font-weight: 400;
+  letter-spacing: 1.5px;
+  white-space: nowrap;
+}
+
+.progress-glow-value {
+  font-family: "Noto Serif SC", serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: #8B7355;
+  line-height: 1;
+  letter-spacing: -0.5px;
+  text-shadow: 0 1px 4px rgba(139,115,85,0.1);
+}
+
+/* 装饰光带 — 横向扫过 */
+.progress-glow-sweep {
+  height: 2px;
+  margin-bottom: 12px;
+  border-radius: 1px;
+  background: rgba(232,228,220,0.3);
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.progress-glow-sweep::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 60%;
+  height: 100%;
+  border-radius: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,183,77,0.5), transparent);
+  animation: sweepSlide 3.5s ease-in-out infinite;
+}
+
+@keyframes sweepSlide {
+  0%   { left: -60%; }
+  100% { left: 160%; }
+}
+
+.progress-glow-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.progress-glow-bar-track {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(232,228,220,0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-glow-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #6B8F71 0%, #8B7355 100%);
+  transition: width 1.2s cubic-bezier(0.16,1,0.3,1);
+  position: relative;
+}
+
+.progress-glow-bar-fill::after {
+  content: '';
+  position: absolute;
+  right: -3px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FFB74D;
+  box-shadow: 0 0 6px rgba(255,183,77,0.6), 0 0 12px rgba(255,183,77,0.3);
+  animation: barDotGlow 2s ease-in-out infinite;
+}
+
+@keyframes barDotGlow {
+  0%,100% { box-shadow: 0 0 6px rgba(255,183,77,0.6), 0 0 12px rgba(255,183,77,0.3); }
+  50%     { box-shadow: 0 0 10px rgba(255,183,77,0.8), 0 0 20px rgba(255,183,77,0.4); }
+}
+
+.progress-glow-bar-text {
+  font-size: 10px;
+  color: #A8A098;
+  font-weight: 400;
+  white-space: nowrap;
+}
+.progress-glow-bar-text b {
+  font-family: "Inter", sans-serif;
+  color: #8B7355;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════════════════════════════════════
+   CTA · 脉冲心跳 (金色版本)
+   ═══════════════════════════════════════════ */
+
+.cta-pulse-wrap {
+  position: relative;
+  animation: ctaPulseRing 2s ease-in-out infinite;
+  border-radius: 24px;
+}
+.cta-pulse-wrap:hover {
+  animation: none;
+}
+.cta-pulse-wrap:hover .cta-sweep {
+  animation: ctaSweepFast 1.8s ease-in-out infinite !important;
+}
+
+/* ═══════════════════════════════════════════
+   纸屑飘落 — 活动氛围（L2 CSS 动画）
+   ═══════════════════════════════════════════ */
+
+.confetti-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.confetti {
+  position: absolute;
+  border-radius: 1px;
+  opacity: 0;
+  animation: confettiFall linear infinite;
+}
+
+@keyframes confettiFall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.5; }
+  90%  { opacity: 0.5; }
+  100% { transform: translateY(852px) rotate(720deg); opacity: 0; }
+}
+
+/* ═══════════════════════════════════════════
+   邀请记录 — 回信卡片
+   ═══════════════════════════════════════════ */
+
+.invite-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  padding: 10px 14px;
+  margin-bottom: 6px;
+  background: rgba(255,255,255,0.5);
+  border: 1px solid rgba(232,228,220,0.5);
+  border-radius: 10px;
+}
+
+.invite-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: #3D3730;
+  white-space: nowrap;
+}
+
+.invite-time {
+  font-size: 10px;
+  color: #A8A098;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.invite-status {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px;
+  font-size: 10px;
+  color: #6B8F71;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.invite-status svg {
+  width: 13px;
+  height: 13px;
+  stroke: #6B8F71;
+}
