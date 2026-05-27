@@ -1,0 +1,253 @@
+/* ===== Reset & Base ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
+  background: #f0f2f5;
+  color: #1f1f1f;
+  font-size: 14px;
+  line-height: 1.6;
+}
+#root { min-height: 100vh; }
+
+/* ===== Sidebar ===== */
+.ant-layout-sider { z-index: 10; }
+.ant-menu-dark .ant-menu-item-icon { transition: color 0.2s; }
+.sidebar-logo {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  flex-shrink: 0;
+}
+.sidebar-logo-text {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+.sidebar-logo-icon {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #1677ff, #4096ff);
+  border-radius: 6px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Collapsed sidebar: hide text labels, keep icons only */
+.ant-menu-inline-collapsed .ant-menu-title-content { display: none !important; }
+.ant-menu-inline-collapsed .ant-menu-item-icon { margin-right: 0 !important; }
+.ant-menu-inline-collapsed .ant-menu-submenu-title .ant-menu-title-content { display: none !important; }
+.ant-menu-inline-collapsed .ant-menu-submenu-arrow { display: none !important; }
+
+/* ===== Header ===== */
+.header-bar {
+  background: #fff;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #f0f0f0;
+  height: 64px;
+  position: sticky;
+  top: 0;
+  z-index: 9;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+.header-collapse-btn {
+  font-size: 16px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.header-module-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 16px;
+  padding-left: 16px;
+  border-left: 1px solid #f0f0f0;
+}
+.header-module-switch-label {
+  font-size: 13px;
+  color: #595959;
+  white-space: nowrap;
+  user-select: none;
+}
+.header-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #1677ff;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+/* ===== Content ===== */
+.content-area { margin: 16px; min-height: 280px; }
+
+/* ===== Filter Panel ===== */
+.filter-panel {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+}
+.filter-item { display: flex; flex-direction: column; gap: 4px; }
+.filter-label {
+  font-size: 13px;
+  color: #595959;
+  white-space: nowrap;
+}
+
+/* ===== Table Container ===== */
+.table-container {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.table-header {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.table-header-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f1f1f;
+  margin-right: 16px;
+}
+.table-header-subtitle {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+/* ===== Status Tags ===== */
+.status-tag-waiting {
+  background: #fff7e6;
+  color: #d46b08;
+  border: 1px solid #ffd591;
+  font-weight: 500;
+}
+.status-tag-active {
+  background: #f6ffed;
+  color: #389e0d;
+  border: 1px solid #b7eb8f;
+  font-weight: 500;
+}
+.status-tag-ended {
+  background: #f5f5f5;
+  color: #595959;
+  border: 1px solid #d9d9d9;
+  font-weight: 500;
+}
+.status-tag-closed {
+  background: #fff1f0;
+  color: #cf1322;
+  border: 1px solid #ffa39e;
+  font-weight: 500;
+}
+
+/* ===== Action Buttons ===== */
+.action-btn { cursor: pointer; padding: 0 4px; }
+.action-btn[disabled], .action-btn.ant-btn-disabled { cursor: not-allowed; opacity: 0.45; }
+.action-btn.ant-btn-link.ant-btn-dangerous { color: #ff4d4f; }
+.action-btn.ant-btn-link.text-success { color: #52c41a; }
+
+/* ===== Tree Table ===== */
+.tree-table .ant-table-cell { white-space: nowrap; }
+.tree-table .ant-table-expand-icon-col { width: 48px; }
+.tree-table .parent-row { font-weight: 500; }
+.tree-table .child-row { font-weight: 400; }
+.tree-table .child-row .ant-table-cell { background: #fafafa; }
+.tree-table .cell-number {
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+/* ===== Switch Modal ===== */
+.switch-modal-table .ant-table-cell { padding: 6px 12px !important; }
+.switch-modal-warning {
+  color: #cf1322;
+  font-size: 12px;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: #fff1f0;
+  border-radius: 6px;
+  border: 1px solid #ffa39e;
+}
+
+/* ===== Empty State ===== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #8c8c8c;
+}
+.empty-state svg { margin-bottom: 16px; opacity: 0.4; }
+.empty-state-text { font-size: 14px; }
+.empty-state-hint { font-size: 12px; color: #bfbfbf; margin-top: 4px; }
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d9d9d9; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #bfbfbf; }
+
+/* ===== Misc ===== */
+.cursor-pointer { cursor: pointer; }
+.text-muted { color: #8c8c8c; }
+.text-center { text-align: center; }
+
+/* ===== Period Tags ===== */
+.period-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 24px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 0 10px;
+  line-height: 1;
+}
+/* Main activity: "共X期" - matches "进行中" status color */
+.period-tag-main {
+  background: #fafafa;
+  color: #8c8c8c;
+  border: 1px solid #d9d9d9;
+  font-weight: 400;
+}
+/* Period tag colors matching status tags exactly */
+.period-tag-waiting { background: #fff7e6; color: #d46b08; border: 1px solid #ffd591; }
+.period-tag-active { background: #f6ffed; color: #389e0d; border: 1px solid #b7eb8f; }
+.period-tag-ended { background: #f5f5f5; color: #595959; border: 1px solid #d9d9d9; }
+.period-tag-closed { background: #fff1f0; color: #cf1322; border: 1px solid #ffa39e; }

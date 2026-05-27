@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>权益卡裂变营销 - 新建/编辑活动</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/dayjs/dayjs.min.js"></script>
+  <script src="https://unpkg.com/dayjs/locale/zh-cn.js"></script>
+  <script src="https://unpkg.com/antd@5.23.4/dist/antd.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/@wangeditor/editor@5.1.23/dist/css/style.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@wangeditor/editor@5.1.23/dist/index.js"></script>
+  <style>
+    /* ===== Form Page ===== */
+    .form-page { margin: 16px; }
+
+    /* Page title row in grey area */
+    .page-title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .page-back-btn { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; color: #8c8c8c; transition: color 0.2s; background: transparent; border: none; cursor: pointer; padding: 0; }
+    .page-back-btn:hover { color: #262626; }
+    .page-title-text { font-size: 17px; font-weight: 600; color: #262626; }
+
+    /* White board */
+    .white-board { background: #fff; border-radius: 8px; }
+
+    /* Section title inside white board */
+    .section-title { padding: 20px 32px 0; font-size: 15px; font-weight: 600; color: #262626; }
+
+    /* Section divider */
+    .section-divider { border: none; border-top: 1px solid #f0f0f0; margin: 16px 32px 0 0; }
+
+    /* Form area */
+    .form-area { padding: 20px 32px 28px; }
+
+    /* Sticky footer inside white board */
+    .board-footer { position: sticky; bottom: 0; background: #fff; padding: 16px 32px 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: center; align-items: center; gap: 16px; }
+    .board-footer .ant-btn { min-width: 120px; }
+
+    /* Rich Editor */
+    .rich-editor-wrap { border: 1px solid #d9d9d9; border-radius: 8px; overflow: hidden; transition: border-color 0.2s; }
+    .rich-editor-wrap:hover { border-color: #4096ff; }
+    .rich-editor-wrap .w-e-toolbar { background: #fff; border-bottom: 1px solid #e8e8e8; }
+    .rich-editor-wrap .w-e-text-container { background: #fff; }
+    .rich-editor-wrap .w-e-text-container [data-slate-editor] { min-height: 120px; max-height: 300px; overflow-y: auto; }
+
+    /* Upload */
+    .poster-upload .ant-upload { border-radius: 8px; }
+    .poster-upload-preview { width: 160px; height: 100px; border-radius: 8px; overflow: hidden; border: 1px solid #d9d9d9; }
+    .poster-upload-preview img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Reward Table */
+    .reward-table .ant-table { font-size: 13px; }
+    .reward-table .ant-table-cell { padding: 8px 6px !important; }
+    .reward-table .ant-input-number { width: 100%; }
+    .reward-table .ant-input { width: 100%; }
+    .reward-table .input-error { border-color: #ff4d4f !important; box-shadow: 0 0 0 2px rgba(255,77,79,0.06) !important; }
+    .reward-table .input-error .ant-input-number-input { border-color: #ff4d4f !important; }
+    .reward-table .input-error .ant-input { border-color: #ff4d4f !important; box-shadow: 0 0 0 2px rgba(255,77,79,0.06) !important; }
+    .reward-table .input-error:hover, .reward-table .input-error:focus { border-color: #ff4d4f !important; }
+    .reward-table .input-error .ant-input-number-input:hover, .reward-table .input-error .ant-input-number-input:focus { border-color: #ff4d4f !important; }
+    .tier-error-msg { color: #ff4d4f; font-size: 12px; margin-top: 2px; }
+    .primary-tier-tag { font-size: 11px; padding: 1px 6px; background: #f0f5ff; color: #2f54eb; border-radius: 3px; margin-left: 6px; }
+
+    /* Period Cards */
+    .period-list { display: flex; flex-wrap: wrap; gap: 16px; }
+    .period-card {
+      width: 340px;
+      border: 1px solid #e8e8e8;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: box-shadow 0.2s, border-color 0.2s;
+      position: relative;
+      background: #fff;
+    }
+    .period-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .period-card.period-error { border-color: #ff4d4f; }
+    .period-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #fafafa;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .period-card-title { font-size: 14px; font-weight: 600; color: #1f1f1f; }
+    .period-card-delete {
+      cursor: pointer;
+      color: #bfbfbf;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      padding: 4px;
+      border-radius: 4px;
+    }
+    .period-card-delete:hover { color: #ff4d4f; }
+    .period-card-body { padding: 16px; }
+    .period-card-body .ant-form-item { margin-bottom: 14px; }
+    .period-card-body .ant-form-item:last-child { margin-bottom: 0; }
+    .add-period-btn { margin-top: 8px; }
+
+    /* Save Confirm Modal */
+    .save-confirm-summary { background: #fafafa; border-radius: 6px; padding: 12px 16px; margin-top: 12px; font-size: 13px; line-height: 1.8; }
+    .save-confirm-summary .summary-row { display: flex; gap: 8px; }
+    .save-confirm-summary .summary-label { color: #8c8c8c; min-width: 80px; flex-shrink: 0; }
+    .save-confirm-summary .summary-value { color: #1f1f1f; }
+
+    /* Character Counter */
+    .char-counter { font-size: 12px; color: #8c8c8c; float: right; margin-top: -22px; }
+    .char-counter.warn { color: #faad14; }
+    .char-counter.error { color: #ff4d4f; }
+
+    /* Form item tweaks */
+    .ant-form-vertical .ant-form-item-label { padding-bottom: 4px; }
+    .ant-form-vertical .ant-form-item-label label { font-size: 13px; color: #595959; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useMemo, useCallback, useEffect, useRef } = React;
+    const {
+      Layout, Menu, Button, Input, Select, DatePicker, Form, Modal, message,
+      Breadcrumb, Space, InputNumber, Table, Tag, Popconfirm, Tooltip, Upload, Radio, Image, Card, Descriptions
+    } = antd;
+    const { Sider, Content, Header } = Layout;
+    const { RangePicker } = DatePicker;
+    const { createEditor, createToolbar } = window.wangEditor;
+    dayjs.locale('zh-cn');
+
+    // ===== URL Params =====
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode') || 'create';
+    const editId = urlParams.get('id') ? parseInt(urlParams.get('id'), 10) : null;
+
+    // ===== Icon Component =====
+    const I = ({ d, size = 16 }) => (
+      <span style={{ display: 'inline-flex', width: size, height: size, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}>
+          <path d={d} />
+        </svg>
+      </span>
+    );
+
+    // ===== Sidebar Icons =====
+    const icons = {
+      tenant: "M3 21h18M5 21V7l8-4v18M19 21V11l-6-6",
+      monitor: "M22 12h-4l-3 9L9 3l-3 9H2",
+      tools: "M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z",
+      helper: "M12 2a10 10 0 1010 10A10 10 0 0012 2zm0 6v4M12 16h.01",
+      users: "M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75",
+      ticket: "M14.5 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14.5 2zM14 2v6h6M12 18v-6M9 15h6",
+      content: "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM16 18H8M16 14H8M10 10V6l6 6",
+      card: "M20 12V6a2 2 0 00-2-2H6a2 2 0 00-2 2v6M6 12v4a2 2 0 002 2h8a2 2 0 002-2v-4M6 12h12",
+      share: "M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13",
+      award: "M12 15l-2 5-3-1 1-3-3-2 3-1-1-3 2 2 2-2-1 3 3 1-3 1z",
+      finance: "M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6",
+      car: "M14 16H9m10 0h-5m-9 0H4a1 1 0 01-1-1v-3a1 1 0 011-1h1l2-4h12l2 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-1M5 16l-1 3m16-3l-1 3",
+      megaphone: "M3 11l18-5v12L3 13v-2zM11.6 18a4 4 0 01-4.6-4M16.6 18a4 4 0 004.6-4",
+      task: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 14l2 2 4-4",
+      trophy: "M6 9H4a2 2 0 01-2-2V5a2 2 0 012-2h2M18 9h2a2 2 0 002-2V5a2 2 0 00-2-2h-2M6 3h12v6a6 6 0 01-12 0V3zM9 21h6M12 17v4",
+      passenger: "M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z",
+      campaign: "M22 12h-4l-3 9L9 3l-3 9H2",
+    };
+
+    const menuItems = [
+      { key: 'tenant', icon: <I d={icons.tenant} />, label: '租户管理' },
+      { key: 'monitor', icon: <I d={icons.monitor} />, label: '系统监控' },
+      { key: 'tools', icon: <I d={icons.tools} />, label: '系统工具' },
+      {
+        key: 'helper', icon: <I d={icons.helper} />, label: '喜行小助手',
+        children: [
+          { key: 'user-mgmt', icon: <I d={icons.users} />, label: '用户管理' },
+          { key: 'ticket', icon: <I d={icons.ticket} />, label: '客服工单' },
+          { key: 'content', icon: <I d={icons.content} />, label: '内容管理' },
+          {
+            key: 'free-card', icon: <I d={icons.card} />, label: '免佣卡商城',
+            children: [
+              { key: 'product-mgmt', icon: <I d={icons.card} />, label: '商品管理' },
+              { key: 'order-mgmt', icon: <I d={icons.task} />, label: '订单管理' },
+              { key: 'ops-config', icon: <I d={icons.tools} />, label: '运营配置' },
+              { key: 'whitelist', icon: <I d={icons.share} />, label: '白名单管理' },
+              { key: 'activity-mgmt', icon: <I d={icons.campaign} />, label: '活动管理' },
+            ],
+          },
+          { key: 'distribution', icon: <I d={icons.share} />, label: '分销管理' },
+          { key: 'captain', icon: <I d={icons.award} />, label: '小队长' },
+          { key: 'finance', icon: <I d={icons.finance} />, label: '财务管理' },
+          { key: 'rental', icon: <I d={icons.car} />, label: '租车管理' },
+          { key: 'user-ops', icon: <I d={icons.megaphone} />, label: '用户运营' },
+          { key: 'task', icon: <I d={icons.task} />, label: '任务管理' },
+          { key: 'match', icon: <I d={icons.trophy} />, label: '赛事管理' },
+        ],
+      },
+      { key: 'passenger', icon: <I d={icons.passenger} />, label: '乘客端' },
+    ];
+
+    // ===== Real Placeholder Poster Images (Unsplash) =====
+    const PLACEHOLDER_BANNER = 'https://picsum.photos/seed/banner-promo/750/400';
+    const PLACEHOLDER_POPUP = 'https://picsum.photos/seed/popup-modal/400/500';
+    const PLACEHOLDER_SHARE = 'https://picsum.photos/seed/share-social/750/400';
+    const PLACEHOLDER_ACTIVITY = 'https://picsum.photos/seed/activity-event/750/400';
+    const PLACEHOLDER_SUCCESS = 'https://picsum.photos/seed/success-pay/750/400';
+
+    // ===== Mock Data for Edit Mode =====
+    const MOCK_ACTIVITIES = {
+      1: {
+        id: 1, name: '北京春日裂变推广', city: '北京',
+        cycleStart: '2026-06-01', cycleEnd: '2026-08-31',
+        status: '待开始',
+        tiers: [
+          { threshold: 12, reward: '返 ¥69.99 本金', maxWinners: 20 },
+          { threshold: 8, reward: '返 ¥69.99 + 下期购卡资格', maxWinners: 50 },
+          { threshold: 5, reward: '返 ¥50.00', maxWinners: '' },
+          { threshold: 3, reward: '返 ¥30.00', maxWinners: '' },
+        ],
+        upgrade: 2, upgradeMode: 'all',
+        periods: [
+          { period: 1, start: '2026-06-01', end: '2026-06-15', purchaseLimit: 500, product: '1天免佣卡' },
+          { period: 2, start: '2026-06-16', end: '2026-06-30', purchaseLimit: 500, product: '1天免佣卡' },
+          { period: 3, start: '2026-07-01', end: '2026-07-15', purchaseLimit: 500, product: '1天免佣卡' },
+          { period: 4, start: '2026-07-16', end: '2026-08-31', purchaseLimit: 500, product: '' },
+        ],
+        bannerPoster: PLACEHOLDER_BANNER, popupPoster: PLACEHOLDER_POPUP, sharePoster: PLACEHOLDER_SHARE, activityPoster: PLACEHOLDER_ACTIVITY, successPoster: PLACEHOLDER_SUCCESS,
+        rules: '<p>1. 活动期间，用户购买资格后可参与分享邀请；</p><p>2. 被邀请人需通过分享链接完成购买，方计为有效转化；</p><p>3. 奖励根据有效转化数匹配对应阶梯；</p><p>4. 每档奖励有人数上限，先到先得。</p>',
+      },
+      3: {
+        id: 3, name: '广州新用户裂变', city: '广州',
+        cycleStart: '2026-07-01', cycleEnd: '2026-09-30',
+        status: '待开始',
+        tiers: [
+          { threshold: 8, reward: '返 ¥59.99 本金', maxWinners: 50 },
+          { threshold: 5, reward: '返 ¥40.00', maxWinners: '' },
+          { threshold: 2, reward: '返 ¥20.00', maxWinners: '' },
+        ],
+        upgrade: 3, upgradeMode: 'all',
+        periods: [
+          { period: 1, start: '2026-07-01', end: '2026-07-20', purchaseLimit: 600, product: '1天免佣卡' },
+          { period: 2, start: '2026-07-21', end: '2026-08-10', purchaseLimit: 600, product: '1天免佣卡' },
+          { period: 3, start: '2026-09-01', end: '2026-09-30', purchaseLimit: 600, product: '1天免佣卡' },
+        ],
+        bannerPoster: PLACEHOLDER_BANNER, popupPoster: PLACEHOLDER_POPUP, sharePoster: PLACEHOLDER_SHARE, activityPoster: PLACEHOLDER_ACTIVITY, successPoster: PLACEHOLDER_SUCCESS,
+        rules: '<p>广州城市专属裂变活动。</p>',
+      },
+      7: {
+        id: 7, name: '武汉限时裂变推广', city: '武汉',
+        cycleStart: '2026-08-01', cycleEnd: '2026-10-31',
+        status: '待开始',
+        tiers: [
+          { threshold: 15, reward: '返 ¥69.99 本金', maxWinners: 10 },
+          { threshold: 10, reward: '返 ¥60.00', maxWinners: '' },
+          { threshold: 6, reward: '返 ¥50.00', maxWinners: '' },
+          { threshold: 3, reward: '返 ¥25.00', maxWinners: '' },
+        ],
+        upgrade: 1, upgradeMode: 'highest',
+        periods: [
+          { period: 1, start: '2026-08-01', end: '2026-08-20', purchaseLimit: 400, product: '' },
+          { period: 2, start: '2026-09-01', end: '2026-10-31', purchaseLimit: 400, product: '' },
+        ],
+        bannerPoster: PLACEHOLDER_BANNER, popupPoster: PLACEHOLDER_POPUP, sharePoster: PLACEHOLDER_SHARE, activityPoster: PLACEHOLDER_ACTIVITY, successPoster: PLACEHOLDER_SUCCESS,
+        rules: '',
+      },
+    };
+
+    // ===== WangEditor Wrapper =====
+    function RichEditor({ value = '', onChange, placeholder = '请输入内容...' }) {
+      const containerRef = useRef(null);
+      const editorInstanceRef = useRef(null);
+      const toolbarInstanceRef = useRef(null);
+      const initializedRef = useRef(false);
+      const onChangeRef = useRef(onChange);
+      const blockOnChangeRef = useRef(true);
+      onChangeRef.current = onChange;
+
+      useEffect(() => {
+        if (!containerRef.current || editorInstanceRef.current) return;
+        const toolbarDiv = document.createElement('div');
+        const editorDiv = document.createElement('div');
+        containerRef.current.appendChild(toolbarDiv);
+        containerRef.current.appendChild(editorDiv);
+        const editor = createEditor({
+          selector: editorDiv, html: value || '',
+          config: {
+            placeholder,
+            onChange(ed) { if (blockOnChangeRef.current) return; onChangeRef.current?.(ed.getHtml()); },
+          },
+          mode: 'simple',
+        });
+        const toolbar = createToolbar({ selector: toolbarDiv, editor, config: {}, mode: 'simple' });
+        editorInstanceRef.current = editor;
+        toolbarInstanceRef.current = toolbar;
+        initializedRef.current = true;
+        const timer = setTimeout(() => { blockOnChangeRef.current = false; }, 100);
+        return () => { clearTimeout(timer); editor.destroy(); editorInstanceRef.current = null; toolbarInstanceRef.current = null; initializedRef.current = false; };
+      }, []);
+
+      useEffect(() => {
+        if (!initializedRef.current || !editorInstanceRef.current) return;
+        if (value === undefined || value === null) return;
+        const currentHtml = editorInstanceRef.current.getHtml();
+        if (currentHtml !== value) editorInstanceRef.current.setHtml(value);
+      }, [value]);
+
+      return <div className="rich-editor-wrap" ref={containerRef} />;
+    }
+
+    // ===== RichEditor for Ant Form =====
+    function RichEditorFormItem({ value, onChange }) {
+      const [innerValue, setInnerValue] = useState(value || '');
+      useEffect(() => { setInnerValue(value || ''); }, [value]);
+      return <RichEditor value={innerValue} onChange={(v) => { setInnerValue(v); onChange?.(v); }} placeholder="请输入活动规则说明..." />;
+    }
+
+    // ===== Poster Upload Component (in-page modal preview) =====
+    function PosterUpload({ value, onChange, label }) {
+      const [fileList, setFileList] = useState([]);
+      const [previewVisible, setPreviewVisible] = useState(false);
+      const [previewUrl, setPreviewUrl] = useState('');
+
+      useEffect(() => {
+        if (value) {
+          setFileList([{ uid: 'init', name: 'poster', status: 'done', url: value }]);
+        }
+      }, [value]);
+
+      const getBase64 = (file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
+
+      const handleChange = ({ fileList: newFileList }) => {
+        setFileList(newFileList);
+        if (newFileList.length > 0 && newFileList[0].originFileObj) {
+          getBase64(newFileList[0].originFileObj).then(url => onChange?.(url));
+        } else if (newFileList.length === 0) {
+          onChange?.('');
+        }
+      };
+
+      const handlePreview = (file) => {
+        setPreviewUrl(file.url || file.thumbUrl);
+        setPreviewVisible(true);
+      };
+
+      const uploadButton = (
+        <div style={{ padding: '20px 0' }}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" width="28" height="28" style={{ margin: '0 auto 8px', display: 'block', color: '#bfbfbf' }}>
+            <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" />
+          </svg>
+          <div style={{ fontSize: 13, color: '#595959' }}>{label}</div>
+        </div>
+      );
+
+      return (
+        <>
+          <Upload
+            listType="picture-card"
+            fileList={fileList}
+            onChange={handleChange}
+            onPreview={handlePreview}
+            maxCount={1}
+            accept="image/*"
+            className="poster-upload"
+          >
+            {fileList.length >= 1 ? null : uploadButton}
+          </Upload>
+          <Modal
+            open={previewVisible}
+            footer={null}
+            onCancel={() => setPreviewVisible(false)}
+            width={800}
+            centered
+            styles={{ body: { padding: 0, textAlign: 'center', background: '#000' } }}
+          >
+            <Image
+              src={previewUrl}
+              style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain' }}
+              preview={false}
+            />
+          </Modal>
+        </>
+      );
+    }
+
+    // ===== Page Title =====
+    const pageTitle = mode === 'edit' ? '编辑活动' : '新建活动';
+
+    // ===== Main App =====
+    function App() {
+      const [collapsed, setCollapsed] = useState(false);
+      const [messageApi, contextHolder] = message.useMessage();
+      const [form] = Form.useForm();
+      const [saveModalOpen, setSaveModalOpen] = useState(false);
+      const [saveSummary, setSaveSummary] = useState(null);
+      const [leaveModalOpen, setLeaveModalOpen] = useState(false);
+      const [saveLoading, setSaveLoading] = useState(false);
+      const [hasChanges, setHasChanges] = useState(false);
+      const [pendingNav, setPendingNav] = useState(null);
+
+      const isEditMode = mode === 'edit' && !!MOCK_ACTIVITIES[editId];
+      const editData = isEditMode ? MOCK_ACTIVITIES[editId] : null;
+
+      // ===== City-Product Mapping =====
+      const CITY_PRODUCTS = {
+        '北京': [{ value: '1天免佣卡', label: '1天免佣卡' }, { value: '3天免佣卡', label: '3天免佣卡' }, { value: '7天免佣卡', label: '7天免佣卡' }],
+        '上海': [{ value: '1天免佣卡', label: '1天免佣卡' }, { value: '3天免佣卡', label: '3天免佣卡' }],
+        '广州': [{ value: '1天免佣卡', label: '1天免佣卡' }, { value: '3天免佣卡', label: '3天免佣卡' }, { value: '5天免佣卡', label: '5天免佣卡' }],
+        '深圳': [{ value: '1天免佣卡', label: '1天免佣卡' }],
+        '杭州': [{ value: '1天免佣卡', label: '1天免佣卡' }, { value: '7天免佣卡', label: '7天免佣卡' }],
+        '成都': [{ value: '1天免佣卡', label: '1天免佣卡' }],
+        '武汉': [{ value: '1天免佣卡', label: '1天免佣卡' }, { value: '3天免佣卡', label: '3天免佣卡' }],
+      };
+
+      // Current city for product dropdown enablement
+      const watchedCity = Form.useWatch('city', form);
+      const selectedCity = watchedCity || (isEditMode && editData ? editData.city : null);
+      const cityProductOptions = selectedCity ? (CITY_PRODUCTS[selectedCity] || []) : [];
+
+      // Refs for tracking original values and changed fields (edit mode)
+      const originalValuesRef = useRef(null);
+      const changedFieldsRef = useRef(new Set());
+      const originalPeriodsRef = useRef(null);
+      const periodsChangedRef = useRef(false);
+
+      // Period state
+      const [periods, setPeriods] = useState(
+        isEditMode && editData.periods
+          ? editData.periods.map(p => ({ ...p, id: Date.now() + p.period }))
+          : [{ period: 1, start: null, end: null, purchaseLimit: null, product: '', id: Date.now() }]
+      );
+      const [periodsChanged, setPeriodsChanged] = useState(!isEditMode);
+
+      // Track whether city has been manually changed (not just initial load)
+      const cityInitializedRef = useRef(false);
+
+      // Reward tiers state
+      const [tiers, setTiers] = useState(
+        isEditMode && editData.tiers
+          ? editData.tiers.map((t, i) => ({ ...t, id: Date.now() + i }))
+          : [{ threshold: '', reward: '', maxWinners: '', id: Date.now() }]
+      );
+
+      // Track form changes
+      const handleValuesChange = useCallback((changed, all) => {
+        setHasChanges(true);
+        // Track changed fields
+        Object.keys(changed).forEach(key => changedFieldsRef.current.add(key));
+        // City change: clear all period products
+        // But skip on initial load — only react to actual user changes
+        if (changed.city && cityInitializedRef.current) {
+          setPeriods(prev => prev.map(pp => ({ ...pp, product: '' })));
+        }
+      }, []);
+
+      // Save original values on mount (edit mode only)
+      useEffect(() => {
+        if (isEditMode && editData) {
+          originalValuesRef.current = {
+            name: editData.name,
+            city: editData.city,
+            cycleTime: [editData.cycleStart, editData.cycleEnd],
+            upgrade: editData.upgrade,
+            upgradeMode: editData.upgradeMode || 'all',
+          };
+          originalPeriodsRef.current = editData.periods.map(p => ({ start: p.start, end: p.end, purchaseLimit: p.purchaseLimit, product: p.product }));
+        }
+        // Mark city as initialized after initial render
+        cityInitializedRef.current = true;
+      }, []);
+
+      // Auto-correct last period end when cycleTime changes
+      const watchedCycleTime = Form.useWatch('cycleTime', form);
+      useEffect(() => {
+        if (watchedCycleTime && watchedCycleTime[1] && periods.length > 0) {
+          const cycleEndStr = watchedCycleTime[1].format('YYYY-MM-DD');
+          const lastPeriod = periods[periods.length - 1];
+          if (lastPeriod.end !== cycleEndStr) {
+            setPeriods(prev => prev.map(pp => pp.id === lastPeriod.id ? { ...pp, end: cycleEndStr } : pp));
+          }
+        }
+      }, [watchedCycleTime]);
+
+      // Leave protection
+      const handleBack = useCallback(() => {
+        if (hasChanges) {
+          setPendingNav('back');
+          setLeaveModalOpen(true);
+        } else {
+          window.location.href = 'activity-list.html';
+        }
+      }, [hasChanges]);
+
+      const confirmLeave = useCallback(() => {
+        setLeaveModalOpen(false);
+        setHasChanges(false);
+        if (pendingNav === 'back') {
+          window.location.href = 'activity-list.html';
+        }
+      }, [pendingNav]);
+
+      const cancelLeave = useCallback(() => {
+        setLeaveModalOpen(false);
+        setPendingNav(null);
+      }, []);
+
+      // Beforeunload handler
+      useEffect(() => {
+        const handler = (e) => {
+          if (hasChanges) {
+            e.preventDefault();
+            e.returnValue = '';
+          }
+        };
+        window.addEventListener('beforeunload', handler);
+        return () => window.removeEventListener('beforeunload', handler);
+      }, [hasChanges]);
+
+      // Period error state
+      const [periodErrors, setPeriodErrors] = useState({});
+
+      // Period operations
+      const addPeriod = () => {
+        const newPeriod = periods.length + 1;
+        setPeriods([...periods, { period: newPeriod, start: null, end: null, purchaseLimit: null, product: '', id: Date.now() + newPeriod }]);
+        setPeriodsChanged(true);
+        setPeriodErrors({});
+      };
+
+      const deletePeriod = (id) => {
+        const filtered = periods.filter(p => p.id !== id);
+        setPeriods(filtered.map((p, i) => ({ ...p, period: i + 1 })));
+        setPeriodsChanged(true);
+        setPeriodErrors({});
+      };
+
+      const updatePeriod = (id, field, val) => {
+        setPeriods(periods.map(p => p.id === id ? { ...p, [field]: val } : p));
+        setPeriodsChanged(true);
+        // Clear error for this field on change
+        setPeriodErrors(prev => {
+          const next = { ...prev };
+          delete next[`${id}_${field}`];
+          return next;
+        });
+      };
+
+      // Tier error state
+      const [tierErrors, setTierErrors] = useState({});
+
+      // Auto-sort tiers by threshold descending (empty values go to bottom)
+      const sortTiers = (list) => {
+        return [...list].sort((a, b) => {
+          const aVal = Number(a.threshold) || 0;
+          const bVal = Number(b.threshold) || 0;
+          if (a.threshold && !b.threshold) return -1;
+          if (!a.threshold && b.threshold) return 1;
+          return bVal - aVal;
+        });
+      };
+
+      // Tier operations
+      const addTier = () => {
+        const newTier = { threshold: '', reward: '', maxWinners: '', id: Date.now() + Math.random() };
+        setTiers(sortTiers([...tiers, newTier]));
+        setTierErrors({});
+      };
+
+      const deleteTier = (id) => {
+        if (tiers.length <= 1) return;
+        setTiers(sortTiers(tiers.filter(t => t.id !== id)));
+        setTierErrors({});
+      };
+
+      const updateTier = (id, field, val) => {
+        const updated = tiers.map(t => t.id === id ? { ...t, [field]: val } : t);
+        // When threshold changes, auto-reorder
+        setTiers(field === 'threshold' ? sortTiers(updated) : updated);
+        // Clear error for this field on change
+        setTierErrors(prev => {
+          const next = { ...prev };
+          delete next[`${id}_${field}`];
+          return next;
+        });
+      };
+
+      // Validation
+      const validateForm = (formValues) => {
+        const errors = [];
+        const isCycleTimeChanged = isEditMode && originalValuesRef.current
+          ? (changedFieldsRef.current.has('cycleTime') || !originalValuesRef.current.cycleTime)
+          : true;
+        const isPeriodsChanged = isEditMode && originalPeriodsRef.current
+          ? periodsChanged
+          : true;
+
+        // Check periods
+        if (periods.length === 0) errors.push('至少需要添加一期');
+        const newPeriodErrors = {};
+        periods.forEach((p, i) => {
+          if (!p.start) {
+            errors.push(`第${p.period}期：请选择开始时间`);
+            newPeriodErrors[`${p.id}_start`] = 'error';
+          }
+          if (!p.end) {
+            errors.push(`第${p.period}期：请选择结束时间`);
+            newPeriodErrors[`${p.id}_end`] = 'error';
+          }
+          if (!p.purchaseLimit || p.purchaseLimit <= 0) {
+            errors.push(`第${p.period}期：资格购买上限必须为正整数`);
+            newPeriodErrors[`${p.id}_purchaseLimit`] = 'error';
+          }
+          if (selectedCity && !p.product) {
+            errors.push(`第${p.period}期：请选择推广商品`);
+            newPeriodErrors[`${p.id}_product`] = 'error';
+          }
+        });
+        setPeriodErrors(newPeriodErrors);
+
+        // Time conflict checks (only if cycleTime or periods changed in edit mode)
+        if (isCycleTimeChanged || isPeriodsChanged) {
+          // Cycle time must start after today
+          if (formValues.cycleTime && formValues.cycleTime[0]) {
+            const cycleStart = formValues.cycleTime[0];
+            const today = dayjs().startOf('day');
+            if (cycleStart.isBefore(today) || cycleStart.isSame(today, 'day')) {
+              errors.push('活动开始时间必须晚于今天');
+            }
+          }
+
+          // Cycle time: end must be after start
+          if (formValues.cycleTime && formValues.cycleTime[0] && formValues.cycleTime[1]) {
+            if (formValues.cycleTime[1].isBefore(formValues.cycleTime[0])) {
+              errors.push('活动结束时间必须晚于开始时间');
+            }
+          }
+
+          // Period overlap check
+          for (let i = 0; i < periods.length; i++) {
+            for (let j = i + 1; j < periods.length; j++) {
+              if (periods[i].start && periods[i].end && periods[j].start && periods[j].end) {
+                const aStart = dayjs(periods[i].start);
+                const aEnd = dayjs(periods[i].end);
+                const bStart = dayjs(periods[j].start);
+                const bEnd = dayjs(periods[j].end);
+                if (aStart.isBefore(bEnd) && bStart.isBefore(aEnd)) {
+                  errors.push(`第${periods[i].period}期与第${periods[j].period}期时间重叠`);
+                }
+              }
+            }
+          }
+        }
+
+        // Check tiers
+        if (tiers.length === 0) errors.push('至少需要配置 1 档奖励阶梯');
+        const newTierErrors = {};
+        tiers.forEach((t, i) => {
+          if (!t.threshold || t.threshold <= 0) {
+            errors.push(`奖励阶梯第${i + 1}行：转化人数门槛必须为正整数`);
+            newTierErrors[`${t.id}_threshold`] = 'error';
+          }
+          if (!t.reward || !t.reward.trim()) {
+            errors.push(`奖励阶梯第${i + 1}行：请输入奖励内容`);
+            newTierErrors[`${t.id}_reward`] = 'error';
+          }
+          // Only validate maxWinners for first tier
+          if (i === 0 && (!t.maxWinners || t.maxWinners <= 0)) {
+            errors.push(`奖励阶梯第${i + 1}行：可获奖人数必须为正整数`);
+            newTierErrors[`${t.id}_maxWinners`] = 'error';
+          }
+        });
+        setTierErrors(newTierErrors);
+
+        // Tier threshold descending check
+        const thresholds = tiers.map(t => Number(t.threshold)).filter(n => !isNaN(n));
+        for (let i = 1; i < thresholds.length; i++) {
+          if (thresholds[i] >= thresholds[i - 1]) {
+            errors.push(`奖励阶梯：转化人数门槛必须降序排列（第${i + 1}行 >= 第${i}行）`);
+            break;
+          }
+        }
+
+        // Upgrade value must be positive integer
+        if (!formValues.upgrade || formValues.upgrade <= 0) {
+          errors.push('门槛升值必须为正整数');
+        }
+
+        // Last period end must equal cycle end
+        if (periods.length > 0 && formValues.cycleTime && formValues.cycleTime[1]) {
+          const cycleEnd = formValues.cycleTime[1].format('YYYY-MM-DD');
+          const lastPeriod = periods[periods.length - 1];
+          if (lastPeriod.end && lastPeriod.end !== cycleEnd) {
+            errors.push(`最后一期（第${lastPeriod.period}期）结束时间必须等于大周期结束时间（${cycleEnd}）`);
+            newPeriodErrors[`${lastPeriod.id}_end`] = 'error';
+            setPeriodErrors(newPeriodErrors);
+          }
+        }
+
+        return errors;
+      };
+
+      // Save
+      const handleSave = async () => {
+        try {
+          const values = await form.validateFields();
+
+          const errors = validateForm(values);
+          if (errors.length > 0) {
+            messageApi.error(errors[0]);
+            return;
+          }
+
+          // Build summary at save time — all fields are validated, no empty data
+          const cycleRange = values.cycleTime && values.cycleTime[0] && values.cycleTime[1]
+            ? `${values.cycleTime[0].format('YYYY-MM-DD')} 至 ${values.cycleTime[1].format('YYYY-MM-DD')}`
+            : '--';
+          const rulesText = (values.rules || '').replace(/<[^>]+>/g, '').trim();
+          const rulesPreview = rulesText ? (rulesText.length > 50 ? rulesText.substring(0, 50) + '...' : rulesText) : '--';
+          const filledTiers = tiers.filter(t => t.threshold);
+          const tierDetails = filledTiers.map((t, i) => ({
+            threshold: t.threshold,
+            reward: t.reward,
+            maxWinners: t.maxWinners,
+            isPrimary: i === 0,
+          }));
+          setSaveSummary({
+            name: values.name,
+            city: values.city,
+            cycle: cycleRange,
+            rules: rulesPreview,
+            upgrade: `${values.upgradeMode === 'all' ? '所有阶梯' : '最高阶梯'} +${values.upgrade}人`,
+            tierCount: tierDetails.length,
+            tierDetails,
+            periodCount: periods.length,
+            periods: periods.map(p => ({
+              period: p.period,
+              start: p.start,
+              end: p.end,
+              purchaseLimit: p.purchaseLimit,
+              product: p.product,
+            })),
+          });
+
+          setSaveModalOpen(true);
+        } catch (err) {
+          // Form validation failed, Ant Design handles inline errors
+        }
+      };
+
+      const confirmSave = () => {
+        setSaveModalOpen(false);
+        setSaveLoading(true);
+        setTimeout(() => {
+          setSaveLoading(false);
+          setHasChanges(false);
+          messageApi.success('保存成功');
+          setTimeout(() => {
+            window.location.href = 'activity-list.html';
+          }, 800);
+        }, 600);
+      };
+
+      // Render
+      return (
+        <Layout style={{ minHeight: '100vh' }}>
+          {contextHolder}
+          <Sider width={200} collapsedWidth={56} theme="dark" collapsible collapsed={collapsed} trigger={null} style={{ overflow: 'auto', height: '100vh', position: 'sticky', top: 0, left: 0 }}>
+            <div className="sidebar-logo" style={{ justifyContent: collapsed ? 'center' : 'flex-start' }}>
+              <div className="sidebar-logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" width="16" height="16">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+              </div>
+              {!collapsed && <span className="sidebar-logo-text">喜行约车</span>}
+            </div>
+            <Menu theme="dark" mode="inline" defaultSelectedKeys={['activity-mgmt']} defaultOpenKeys={['helper', 'free-card']} inlineCollapsed={collapsed} items={menuItems} style={{ borderInlineEnd: 0 }} />
+          </Sider>
+          <Layout>
+            <Header className="header-bar">
+              <div className="header-left">
+                <Button type="text" onClick={() => setCollapsed(!collapsed)} className="header-collapse-btn" aria-label={collapsed ? '展开侧边栏' : '收起侧边栏'}>
+                  {collapsed ? <I d="M9 18l6-6-6-6" size={18} /> : <I d="M4 6h16M4 12h16M4 18h16" size={18} />}
+                </Button>
+                <Breadcrumb items={[
+                  { title: '喜行小助手' },
+                  { title: '免佣卡商城' },
+                  { title: <a href="activity-list.html" style={{ color: '#595959' }}>活动管理</a> },
+                  { title: pageTitle },
+                ]} />
+              </div>
+              <div className="header-avatar">管</div>
+            </Header>
+            <Content className="form-page">
+              {/* Page Title Row (no background, in grey area) */}
+              <div className="page-title-row">
+                <Button type="text" onClick={handleBack} className="page-back-btn" icon={<I d="M15 18l-6-6 6-6" size={20} />} />
+                <span className="page-title-text">{pageTitle}</span>
+              </div>
+
+              <div className="white-board">
+                <Form
+                  form={form}
+                  layout="vertical"
+                  onValuesChange={handleValuesChange}
+                  initialValues={isEditMode ? {
+                    name: editData.name,
+                    city: editData.city,
+                    cycleTime: [dayjs(editData.cycleStart), dayjs(editData.cycleEnd)],
+                    rules: editData.rules,
+                    upgrade: editData.upgrade,
+                    upgradeMode: editData.upgradeMode || 'all',
+                    bannerPoster: editData.bannerPoster,
+                    popupPoster: editData.popupPoster,
+                    sharePoster: editData.sharePoster,
+                    activityPoster: editData.activityPoster,
+                    successPoster: editData.successPoster,
+                    sharePoster2: editData.sharePoster,
+                  } : {}}
+                >
+                  {/* Section 1: Basic Info */}
+                  <div className="section-title">基本信息</div>
+                  <div className="form-area">
+                    <Form.Item label="活动名称" name="name" rules={[{ required: true, message: '请输入活动名称' }, { max: 15, message: '活动名称不能超过 15 个字符' }]}>
+                      <Input placeholder="请输入活动名称" maxLength={15} showCount />
+                    </Form.Item>
+                    <Form.Item label="活动规则" name="rules" rules={[{ required: true, message: '请输入活动规则' }]}>
+                      <RichEditorFormItem />
+                    </Form.Item>
+                    <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+                      <Form.Item style={{ flex: '1 1 45%' }} label="Banner图" name="bannerPoster" rules={[{ required: true, message: '请上传Banner图' }]}>
+                        <PosterUpload label="点击上传Banner图" />
+                      </Form.Item>
+                      <Form.Item style={{ flex: '1 1 45%' }} label="活动弹窗宣传海报" name="popupPoster" rules={[{ required: true, message: '请上传活动弹窗宣传海报' }]}>
+                        <PosterUpload label="点击上传弹窗海报" />
+                      </Form.Item>
+                    </div>
+                  </div>
+
+                  {/* ===== 区块二：主活动配置 ===== */}
+                  <hr className="section-divider" />
+                  <div className="section-title">主活动配置</div>
+                  <div className="form-area" style={{ paddingTop: 16 }}>
+                    {/* 活动城市 */}
+                    <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+                      <Form.Item style={{ flex: '1 1 45%' }} label="活动城市" name="city" rules={[{ required: true, message: '请选择活动城市' }]}>
+                        <Select
+                          placeholder="请选择活动城市"
+                          options={[
+                            { value: '北京', label: '北京' },
+                            { value: '上海', label: '上海' },
+                            { value: '广州', label: '广州' },
+                            { value: '深圳', label: '深圳' },
+                            { value: '杭州', label: '杭州' },
+                            { value: '成都', label: '成都' },
+                            { value: '武汉', label: '武汉' },
+                          ]}
+                        />
+                      </Form.Item>
+                    </div>
+                    {/* 奖励阶梯 */}
+                    <Form.Item label="奖励阶梯" required style={{ marginBottom: 4 }}>
+                      <div style={{ fontSize: 12, color: '#8c8c8c', marginBottom: 8 }}>至少配置 1 档，按转化人数降序排列。达成最上面一档默认返还本金。</div>
+                      <Table
+                        className="reward-table"
+                        size="small"
+                        pagination={false}
+                        showHeader={true}
+                        columns={[
+                          {
+                            title: '转化人数门槛',
+                            key: 'threshold',
+                            width: 160,
+                            render: (_, record, index) => (
+                              <div>
+                                <InputNumber
+                                  value={record.threshold}
+                                  onChange={(v) => updateTier(record.id, 'threshold', v)}
+                                  placeholder="正整数"
+                                  min={1}
+                                  precision={0}
+                                  className={tierErrors[`${record.id}_threshold`] ? 'input-error' : ''}
+                                  style={{ width: '100%' }}
+                                />
+                                {tierErrors[`${record.id}_threshold`] && <div className="tier-error-msg">请输入正整数</div>}
+                              </div>
+                            ),
+                          },
+                          {
+                            title: '奖励内容',
+                            key: 'reward',
+                            render: (_, record, index) => (
+                              <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                  <Input
+                                    value={record.reward}
+                                    onChange={(e) => updateTier(record.id, 'reward', e.target.value)}
+                                    placeholder="限 15 字符"
+                                    maxLength={15}
+                                    className={tierErrors[`${record.id}_reward`] ? 'input-error' : ''}
+                                  />
+                                  {index === 0 && <Tag color="blue" className="primary-tier-tag">返还本金</Tag>}
+                                </div>
+                                {tierErrors[`${record.id}_reward`] && <div className="tier-error-msg">请输入奖励内容</div>}
+                              </div>
+                            ),
+                          },
+                          {
+                            title: '可获奖人数最大值',
+                            key: 'maxWinners',
+                            width: 160,
+                            render: (_, record, index) => (
+                              index === 0 ? (
+                                <div>
+                                  <InputNumber
+                                    value={record.maxWinners}
+                                    onChange={(v) => updateTier(record.id, 'maxWinners', v)}
+                                    placeholder="正整数"
+                                    min={1}
+                                    precision={0}
+                                    className={tierErrors[`${record.id}_maxWinners`] ? 'input-error' : ''}
+                                    style={{ width: '100%' }}
+                                  />
+                                  {tierErrors[`${record.id}_maxWinners`] && <div className="tier-error-msg">请输入正整数</div>}
+                                </div>
+                              ) : <span style={{ color: '#8c8c8c' }}>无限制</span>
+                            ),
+                          },
+                          {
+                            title: '操作',
+                            key: 'action',
+                            width: 60,
+                            align: 'center',
+                            render: (_, record) => (
+                              tiers.length > 1 ? (
+                                <Button type="link" danger size="small" onClick={() => deleteTier(record.id)} style={{ padding: '0 4px' }}>
+                                  <I d="M18 6L6 18M6 6l12 12" size={14} />
+                                </Button>
+                              ) : null
+                            ),
+                          },
+                        ]}
+                        dataSource={tiers}
+                        rowKey="id"
+                      />
+                      <Button type="dashed" onClick={addTier} block style={{ marginTop: 8, width: 200 }}>
+                        <I d="M12 5v14M5 12h14" size={14} /> 添加阶梯
+                      </Button>
+                    </Form.Item>
+
+                    {/* 门槛升值 */}
+                    <Form.Item label="门槛升值" required>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+                          <span style={{ color: '#8c8c8c', minWidth: 110, flexShrink: 0 }}>选择升值模式</span>
+                          <Form.Item name="upgradeMode" noStyle rules={[{ required: true, message: '请选择升值模式' }]} initialValue="all">
+                            <Radio.Group options={[
+                              { label: '所有阶梯', value: 'all' },
+                              { label: '最高阶梯', value: 'highest' },
+                            ]} />
+                          </Form.Item>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 24 }}>
+                          <span style={{ color: '#8c8c8c', minWidth: 110, flexShrink: 0, lineHeight: '32px' }}>设置升值人数</span>
+                          <div style={{ flex: 1 }}>
+                            <Form.Item name="upgrade" noStyle rules={[{ required: true, message: '请输入门槛升值数' }]}>
+                              <InputNumber placeholder="正整数" min={1} precision={0} style={{ width: 200 }} addonAfter="人" />
+                            </Form.Item>
+                            <div style={{ fontSize: 12, color: '#8c8c8c', marginTop: 4 }}>
+                              用户获奖后，下期该阶梯个人门槛 = 原门槛 + 升级值 x 该用户已获奖次数
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Form.Item>
+                    {/* 活动详情页海报 + 支付成功页海报 + 分享海报 */}
+                    <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+                      <div style={{ flex: '1 1 25%' }}>
+                        <Form.Item label="活动详情页-活动海报" name="activityPoster" rules={[{ required: true, message: '请上传活动海报' }]}>
+                          <PosterUpload label="点击上传活动海报" />
+                        </Form.Item>
+                        <div style={{ fontSize: 12, color: '#8c8c8c', marginTop: -8 }}>移动端活动详情页用户看到的图片</div>
+                      </div>
+                      <div style={{ flex: '1 1 25%' }}>
+                        <Form.Item label="支付成功页-宣传海报" name="successPoster" rules={[{ required: true, message: '请上传支付成功页海报' }]}>
+                          <PosterUpload label="点击上传支付成功页海报" />
+                        </Form.Item>
+                        <div style={{ fontSize: 12, color: '#8c8c8c', marginTop: -8 }}>移动端支付成功页用户看到的图片</div>
+                      </div>
+                      <div style={{ flex: '1 1 25%' }}>
+                        <Form.Item label="分享海报" name="sharePoster2" rules={[{ required: true, message: '请上传分享海报' }]}>
+                          <PosterUpload label="点击上传分享海报" />
+                        </Form.Item>
+                        <div style={{ fontSize: 12, color: '#8c8c8c', marginTop: -8 }}>用户分享裂变时生成的海报素材</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ===== 区块三：期次管理 ===== */}
+                  <hr className="section-divider" />
+                  <div className="section-title">期次管理</div>
+                  <div className="form-area" style={{ paddingTop: 16, paddingBottom: 20 }}>
+                    {/* 大周期时间 */}
+                    <Form.Item label="活动时间范围" name="cycleTime" rules={[{ required: true, message: '请选择活动时间范围' }]}>
+                      <RangePicker
+                        style={{ width: '100%', maxWidth: 480 }}
+                        disabledDate={(current) => current && current.isBefore(dayjs().startOf('day').add(1, 'day'))}
+                        placeholder={['开始日期', '结束日期']}
+                      />
+                    </Form.Item>
+                    {/* 卡片列表 */}
+                    <div className="period-list">
+                      {periods.map((p) => {
+                        const hasPeriodError = periodErrors[`${p.id}_start`] || periodErrors[`${p.id}_end`] || periodErrors[`${p.id}_purchaseLimit`];
+                        return (
+                        <div className={`period-card${hasPeriodError ? ' period-error' : ''}`} key={p.id}>
+                          <div className="period-card-header">
+                            <span className="period-card-title">第 {p.period} 期</span>
+                            {p.period > 1 && (
+                              <Tooltip title="删除期次">
+                                <div className="period-card-delete" onClick={() => {
+                                  Modal.confirm({
+                                    title: '确认删除',
+                                    content: `确定要删除「第 ${p.period} 期」吗？删除后剩余期次将自动重编号。`,
+                                    okText: '确认删除',
+                                    cancelText: '取消',
+                                    okButtonProps: { danger: true },
+                                    onOk: () => deletePeriod(p.id),
+                                  });
+                                }}>
+                                  <I d="M18 6L6 18M6 6l12 12" size={16} />
+                                </div>
+                              </Tooltip>
+                            )}
+                          </div>
+                          <div className="period-card-body">
+                            <div style={{ marginBottom: 8 }}>
+                              <label style={{ fontSize: 13, color: '#595959', display: 'block', marginBottom: 4 }}>活动时间</label>
+                              <RangePicker
+                                style={{ width: '100%' }}
+                                status={periodErrors[`${p.id}_start`] || periodErrors[`${p.id}_end`] ? 'error' : ''}
+                                value={[p.start ? dayjs(p.start) : null, p.end ? dayjs(p.end) : null]}
+                                onChange={(dates) => {
+                                  const startDate = dates && dates[0] ? dates[0].format('YYYY-MM-DD') : null;
+                                  let endDate = dates && dates[1] ? dates[1].format('YYYY-MM-DD') : null;
+                                  // 如果是最后一期，自动将结束时间校正为周期结束时间
+                                  if (p.period === periods.length && endDate && form.getFieldValue('cycleTime') && form.getFieldValue('cycleTime')[1]) {
+                                    endDate = form.getFieldValue('cycleTime')[1].format('YYYY-MM-DD');
+                                  }
+                                  setPeriods(periods.map(pp => pp.id === p.id ? { ...pp, start: startDate, end: endDate } : pp));
+                                  setPeriodsChanged(true);
+                                  setHasChanges(true);
+                                }}
+                                placeholder={['开始日期', '结束日期']}
+                              />
+                              {(periodErrors[`${p.id}_start`] || periodErrors[`${p.id}_end`]) && <div className="tier-error-msg">请选择活动时间</div>}
+                            </div>
+                            <div style={{ marginBottom: 8 }}>
+                              <label style={{ fontSize: 13, color: '#595959', display: 'block', marginBottom: 4 }}>推广商品</label>
+                              <Select
+                                style={{ width: '100%' }}
+                                value={p.product || undefined}
+                                onChange={(v) => { updatePeriod(p.id, 'product', v); setPeriodsChanged(true); setHasChanges(true); }}
+                                placeholder={selectedCity ? '请选择商品' : '请先选择活动城市'}
+                                options={cityProductOptions}
+                                disabled={!selectedCity}
+                                status={periodErrors[`${p.id}_product`] ? 'error' : ''}
+                              />
+                              {periodErrors[`${p.id}_product`] && <div className="tier-error-msg">请选择推广商品</div>}
+                            </div>
+                            <div>
+                              <label style={{ fontSize: 13, color: '#595959', display: 'block', marginBottom: 4 }}>资格购买上限</label>
+                              <InputNumber
+                                className={periodErrors[`${p.id}_purchaseLimit`] ? 'input-error' : ''}
+                                style={{ width: '100%' }}
+                                value={p.purchaseLimit}
+                                onChange={(v) => { updatePeriod(p.id, 'purchaseLimit', v); setPeriodsChanged(true); setHasChanges(true); }}
+                                placeholder="正整数"
+                                min={1}
+                                precision={0}
+                              />
+                              {periodErrors[`${p.id}_purchaseLimit`] && <div className="tier-error-msg">请输入正整数</div>}
+                            </div>
+                          </div>
+                        </div>
+                      );})}
+                    </div>
+                    <Button type="dashed" onClick={addPeriod} className="add-period-btn" block={false} style={{ width: 200, marginTop: 8 }}>
+                      <I d="M12 5v14M5 12h14" size={14} /> 添加期次
+                    </Button>
+                  </div>
+                </Form>
+
+                {/* Sticky Footer (centered buttons) */}
+                <div className="board-footer">
+                  <Button onClick={handleBack}>取消</Button>
+                  <Button type="primary" onClick={handleSave} loading={saveLoading}>确认保存</Button>
+                </div>
+              </div>
+            </Content>
+          </Layout>
+
+          {/* Save Confirmation Modal */}
+          <Modal
+            title="确认保存活动配置"
+            open={saveModalOpen}
+            onOk={confirmSave}
+            onCancel={() => setSaveModalOpen(false)}
+            okText="确认保存"
+            cancelText="取消"
+            confirmLoading={saveLoading}
+            width={720}
+            styles={{ body: { padding: '16px 24px' } }}
+          >
+            {saveSummary && (
+            <div style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+              {/* 区块一：基本信息 */}
+              <Card title="基本信息" size="small" style={{ marginBottom: 12 }}>
+                <Descriptions column={2} size="small" labelStyle={{ color: '#8c8c8c' }}>
+                  <Descriptions.Item label="活动名称" span={2}>{saveSummary.name}</Descriptions.Item>
+                  <Descriptions.Item label="活动规则" span={2}>{saveSummary.rules}</Descriptions.Item>
+                </Descriptions>
+              </Card>
+
+              {/* 区块二：主活动配置 */}
+              <Card title="主活动配置" size="small" style={{ marginBottom: 12 }}>
+                <Descriptions column={2} size="small" labelStyle={{ color: '#8c8c8c' }}>
+                  <Descriptions.Item label="活动城市">{saveSummary.city}</Descriptions.Item>
+                  <Descriptions.Item label="门槛升值" span={2}>{saveSummary.upgrade}</Descriptions.Item>
+                </Descriptions>
+                <div style={{ marginTop: 8, marginBottom: 4 }}>
+                  <span style={{ fontSize: 12, color: '#8c8c8c' }}>奖励阶梯（共 {saveSummary.tierCount} 档）</span>
+                </div>
+                <Table
+                  size="small"
+                  pagination={false}
+                  showHeader={false}
+                  columns={[
+                    { title: '门槛', dataIndex: 'threshold', width: 60, render: v => (
+                      <span style={{ fontWeight: 600 }}>{v}人</span>
+                    )},
+                    { title: '奖励', dataIndex: 'reward', ellipsis: true, render: (v, _, i) => (
+                      <span>{v}{i === 0 && <Tag color="blue" style={{ fontSize: 11, padding: '0 4px', marginLeft: 6 }}>返还本金</Tag>}</span>
+                    )},
+                    { title: '名额', dataIndex: 'maxWinners', width: 60, align: 'right', render: v => v ? v + '人' : '无限制' },
+                  ]}
+                  dataSource={saveSummary.tierDetails}
+                  rowKey="threshold"
+                />
+              </Card>
+
+              {/* 区块三：期次管理 */}
+              <Card title="期次管理" size="small">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <span style={{ fontSize: 12, color: '#8c8c8c', flexShrink: 0 }}>活动总时间：</span>
+                  <span style={{ fontSize: 13, color: '#1f1f1f' }}>{saveSummary.cycle}</span>
+                </div>
+                <Table
+                  size="small"
+                  pagination={false}
+                  columns={[
+                    { title: '期次', dataIndex: 'period', width: 70, render: v => `第 ${v} 期` },
+                    { title: '推广商品', dataIndex: 'product', width: 110, ellipsis: true, render: v => v || '--' },
+                    { title: '活动时间', render: (_, r) => {
+                      const s = r.start ? dayjs(r.start).format('YYYY-MM-DD') : '--';
+                      const e = r.end ? dayjs(r.end).format('YYYY-MM-DD') : '--';
+                      return `${s} ~ ${e}`;
+                    }},
+                    { title: '资格购买上限', dataIndex: 'purchaseLimit', width: 100, align: 'right', render: v => (v ? v + ' 人' : '--') },
+                  ]}
+                  dataSource={saveSummary.periods}
+                  rowKey="period"
+                />
+              </Card>
+            </div>
+            )}
+          </Modal>
+
+          {/* Leave Confirmation Modal */}
+          <Modal
+            title="确认离开"
+            open={leaveModalOpen}
+            onOk={confirmLeave}
+            onCancel={cancelLeave}
+            okText="离开"
+            cancelText="留在页面"
+            okButtonProps={{ danger: true }}
+          >
+            <p style={{ color: '#595959', fontSize: 13 }}>当前页面有未保存的更改，确定要离开吗？</p>
+          </Modal>
+        </Layout>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>

@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>活动详情 - 权益卡裂变营销</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/dayjs/dayjs.min.js"></script>
+  <script src="https://unpkg.com/dayjs/locale/zh-cn.js"></script>
+  <script src="https://unpkg.com/antd@5.23.4/dist/antd.min.js"></script>
+  <style>
+    /* ===== Detail Page ===== */
+    .detail-page { margin: 16px; }
+    .page-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .page-title-left { display: flex; align-items: center; gap: 12px; }
+    .page-back-btn { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; color: #8c8c8c; transition: color 0.2s; background: transparent; border: none; cursor: pointer; padding: 0; }
+    .page-back-btn:hover { color: #262626; }
+    .page-title-text { font-size: 17px; font-weight: 600; color: #262626; }
+
+    /* Info Card */
+    .info-card { background: #fff; border-radius: 8px; padding: 24px; margin-bottom: 16px; }
+    .info-card .ant-descriptions-item-label { font-size: 13px; color: #595959; font-weight: 400; }
+    .info-card .ant-descriptions-item-content { font-size: 14px; }
+    .info-card .poster-thumb { width: 180px; height: 110px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 1px solid #e8e8e8; transition: box-shadow 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .info-card .poster-thumb:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+    .info-card .tier-list { margin: 0; padding: 0; list-style: none; }
+    .info-card .tier-list li { font-size: 13px; padding: 3px 0; }
+
+    /* No Data Hint */
+    .no-data-hint { background: #fff; border-radius: 8px; padding: 40px; text-align: center; margin-bottom: 16px; }
+    .no-data-hint svg { opacity: 0.3; margin-bottom: 12px; }
+    .no-data-hint p { color: #8c8c8c; font-size: 14px; margin: 0; }
+
+    /* Card Grid */
+    .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; transition: opacity 0.2s ease, transform 0.2s ease; }
+    .card-grid.hidden { opacity: 0; transform: translateY(-8px); pointer-events: none; position: absolute; visibility: hidden; }
+    .period-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      cursor: pointer;
+      border: 1px solid #f0f0f0;
+      transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .period-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-2px); border-color: #d9d9d9; }
+    .period-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .period-card-title { font-size: 15px; font-weight: 600; color: #262626; }
+    .period-card-time { font-size: 13px; color: #8c8c8c; margin-bottom: 16px; }
+    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .metric-item { }
+    .metric-label { font-size: 12px; color: #8c8c8c; margin-bottom: 2px; }
+    .metric-value { font-size: 20px; font-weight: 600; color: #262626; font-variant-numeric: tabular-nums; }
+    .metric-unit { font-size: 12px; color: #8c8c8c; font-weight: 400; margin-left: 2px; }
+    .period-card-footer { border-top: 1px solid #f5f5f5; padding-top: 10px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .period-card-footer span { font-size: 12px; color: #8c8c8c; }
+
+    /* Table View */
+    .table-view { transition: opacity 0.2s ease; }
+    .table-view.hidden { opacity: 0; pointer-events: none; position: absolute; visibility: hidden; }
+    .table-toolbar { display: flex; align-items: center; justify-content: space-between; background: #fff; border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; gap: 12px; }
+    .table-toolbar-left { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .table-toolbar-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+    .period-segmented { min-width: 0; }
+    .period-segmented .ant-segmented-item { text-align: center; padding: 6px 16px; font-size: 13px; }
+    .period-segmented .ant-segmented-item-label { white-space: nowrap; }
+    .table-filter-row { background: #fff; border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+    .table-filter-item { display: flex; flex-direction: column; gap: 4px; }
+    .table-filter-label { font-size: 12px; color: #8c8c8c; }
+    .table-container { background: #fff; border-radius: 8px; overflow: hidden; }
+    .table-container .ant-table-cell { white-space: nowrap; }
+    .cell-number { font-variant-numeric: tabular-nums; }
+
+    /* Drawer */
+    .drawer-user-info { margin-bottom: 16px; }
+    .drawer-user-info .ant-descriptions-item-label { font-size: 12px; color: #595959; }
+    .drawer-user-info .ant-descriptions-item-content { font-size: 13px; }
+    .drawer-tabs-area .ant-tabs-nav { margin-bottom: 12px; }
+
+    /* Record Modal */
+    .record-modal-table .ant-table-cell { padding: 8px 12px !important; }
+
+    /* Empty state */
+    .drawer-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; color: #bfbfbf; }
+    .drawer-empty svg { opacity: 0.3; margin-bottom: 8px; }
+    .drawer-empty p { font-size: 13px; margin: 0; }
+
+    /* Image preview */
+    .poster-preview-lg { max-width: 400px; max-height: 300px; object-fit: contain; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useMemo, useCallback, useEffect } = React;
+    const {
+      Layout, Menu, Button, Input, Select, DatePicker, Tag, Popconfirm,
+      message, Breadcrumb, Descriptions, Drawer, Modal, Table, Image,
+      Tooltip, Space, Checkbox, Segmented, Pagination, Dropdown
+    } = antd;
+    const { Sider, Content, Header } = Layout;
+    const dayjs = window.dayjs;
+    dayjs.locale('zh-cn');
+
+    // ===== URL Params =====
+    const urlParams = new URLSearchParams(window.location.search);
+    const activityId = parseInt(urlParams.get('id'), 10) || 1;
+
+    // ===== Icon Component =====
+    const I = ({ d, size = 16 }) => (
+      <span style={{ display: 'inline-flex', width: size, height: size, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}>
+          <path d={d} />
+        </svg>
+      </span>
+    );
+
+    // ===== Sidebar Icons =====
+    const icons = {
+      tenant: "M3 21h18M5 21V7l8-4v18M19 21V11l-6-6",
+      monitor: "M22 12h-4l-3 9L9 3l-3 9H2",
+      tools: "M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z",
+      helper: "M12 2a10 10 0 1010 10A10 10 0 0012 2zm0 6v4M12 16h.01",
+      users: "M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75",
+      ticket: "M14.5 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14.5 2zM14 2v6h6M12 18v-6M9 15h6",
+      content: "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM16 18H8M16 14H8M10 10V6l6 6",
+      card: "M20 12V6a2 2 0 00-2-2H6a2 2 0 00-2 2v6M6 12v4a2 2 0 002 2h8a2 2 0 002-2v-4M6 12h12",
+      share: "M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13",
+      award: "M12 15l-2 5-3-1 1-3-3-2 3-1-1-3 2 2 2-2-1 3 3 1-3 1z",
+      finance: "M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6",
+      car: "M14 16H9m10 0h-5m-9 0H4a1 1 0 01-1-1v-3a1 1 0 011-1h1l2-4h12l2 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-1M5 16l-1 3m16-3l-1 3",
+      megaphone: "M3 11l18-5v12L3 13v-2zM11.6 18a4 4 0 01-4.6-4M16.6 18a4 4 0 004.6-4",
+      calendar: "M19 4H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zM16 2v4M8 2v4M3 10h18",
+      task: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 14l2 2 4-4",
+      trophy: "M6 9H4a2 2 0 01-2-2V5a2 2 0 012-2h2M18 9h2a2 2 0 002-2V5a2 2 0 00-2-2h-2M6 3h12v6a6 6 0 01-12 0V3zM9 21h6M12 17v4",
+      passenger: "M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z",
+      campaign: "M22 12h-4l-3 9L9 3l-3 9H2",
+    };
+
+    const menuItems = [
+      { key: 'tenant', icon: <I d={icons.tenant} />, label: '租户管理' },
+      { key: 'monitor', icon: <I d={icons.monitor} />, label: '系统监控' },
+      { key: 'tools', icon: <I d={icons.tools} />, label: '系统工具' },
+      {
+        key: 'helper', icon: <I d={icons.helper} />, label: '喜行小助手',
+        children: [
+          { key: 'user-mgmt', icon: <I d={icons.users} />, label: '用户管理' },
+          { key: 'ticket', icon: <I d={icons.ticket} />, label: '客服工单' },
+          { key: 'content', icon: <I d={icons.content} />, label: '内容管理' },
+          {
+            key: 'free-card', icon: <I d={icons.card} />, label: '免佣卡商城',
+            children: [
+              { key: 'product-mgmt', icon: <I d={icons.card} />, label: '商品管理' },
+              { key: 'order-mgmt', icon: <I d={icons.task} />, label: '订单管理' },
+              { key: 'ops-config', icon: <I d={icons.tools} />, label: '运营配置' },
+              { key: 'whitelist', icon: <I d={icons.share} />, label: '白名单管理' },
+              { key: 'activity-mgmt', icon: <I d={icons.campaign} />, label: '活动管理' },
+            ],
+          },
+          { key: 'distribution', icon: <I d={icons.share} />, label: '分销管理' },
+          { key: 'captain', icon: <I d={icons.award} />, label: '小队长' },
+          { key: 'finance', icon: <I d={icons.finance} />, label: '财务管理' },
+          { key: 'rental', icon: <I d={icons.car} />, label: '租车管理' },
+          { key: 'user-ops', icon: <I d={icons.megaphone} />, label: '用户运营' },
+          { key: 'task', icon: <I d={icons.task} />, label: '任务管理' },
+          { key: 'match', icon: <I d={icons.trophy} />, label: '赛事管理' },
+        ],
+      },
+      { key: 'passenger', icon: <I d={icons.passenger} />, label: '乘客端' },
+    ];
+
+    // ===== Status Tag =====
+    const StatusTag = ({ status }) => {
+      const cls = {
+        '待开始': 'status-tag-waiting',
+        '进行中': 'status-tag-active',
+        '已结束': 'status-tag-ended',
+        '已关闭': 'status-tag-closed',
+      }[status] || '';
+      return <Tag className={cls}>{status}</Tag>;
+    };
+
+    // ===== Activity Data (fallback mock) =====
+    const BANNER_POSTER = 'https://picsum.photos/seed/banner2026/800/500';
+    const SHARE_POSTER = 'https://picsum.photos/seed/share2026/800/500';
+    const SUCCESS_POSTER = 'https://picsum.photos/seed/success2026/800/500';
+    const POPUP_POSTER = 'https://picsum.photos/seed/popup-modal/400/500';
+
+    const MOCK_ACTIVITIES = {
+      1: {
+        id: 1, name: '北京春日裂变推广', city: '北京',
+        cycleStart: '2026-06-01', cycleEnd: '2026-08-31',
+        status: '进行中', product: '1天免佣卡', price: 69.99,
+        qualifyName: '免佣体验资格',
+        tiers: [
+          { threshold: 3, reward: '返 ¥30.00', maxWinners: 200 },
+          { threshold: 5, reward: '返 ¥50.00', maxWinners: null },
+          { threshold: 8, reward: '返 ¥69.99 + 下期购卡资格', maxWinners: null },
+          { threshold: 12, reward: '返 ¥69.99 本金', maxWinners: null },
+        ],
+        upgrade: 2,
+        periods: [
+          { period: 1, start: '2026-06-01', end: '2026-06-15', status: '已结束', users: 320, conversions: 186, winners: 38, remainingReward: 62, purchaseLimit: 500, product: '1天免佣卡' },
+          { period: 2, start: '2026-06-16', end: '2026-06-30', status: '进行中', users: 480, conversions: 256, winners: 52, remainingReward: 48, purchaseLimit: 500, product: '3天免佣卡' },
+          { period: 3, start: '2026-07-01', end: '2026-07-15', status: '待开始', users: 0, conversions: 0, winners: 0, remainingReward: 200, purchaseLimit: 500, product: '7天免佣卡' },
+          { period: 4, start: '2026-07-16', end: '2026-08-31', status: '待开始', users: 0, conversions: 0, winners: 0, remainingReward: 200, purchaseLimit: 500, product: '1天免佣卡' },
+        ],
+        bannerPoster: BANNER_POSTER, successPoster: SUCCESS_POSTER, sharePoster: SHARE_POSTER, popupPoster: POPUP_POSTER,
+        rules: '<p>1. 活动期间，用户购买资格后可参与分享邀请；</p><p>2. 被邀请人需通过分享链接完成购买，方计为有效转化；</p><p>3. 奖励根据有效转化数匹配对应阶梯；</p><p>4. 每档奖励有人数上限，先到先得。</p>',
+      },
+      2: {
+        id: 2, name: '上海司机裂变计划', city: '上海',
+        cycleStart: '2026-05-15', cycleEnd: '2026-07-31',
+        status: '进行中', product: '1天免佣卡', price: 79.99,
+        qualifyName: '免佣体验资格',
+        tiers: [
+          { threshold: 4, reward: '返 ¥40.00', maxWinners: 150 },
+          { threshold: 7, reward: '返 ¥79.99 本金', maxWinners: null },
+          { threshold: 10, reward: '返 ¥79.99 + 专属称号', maxWinners: null },
+        ],
+        upgrade: 1,
+        periods: [
+          { period: 1, start: '2026-05-15', end: '2026-05-31', status: '进行中', users: 560, conversions: 312, winners: 56, remainingReward: 74, purchaseLimit: 400, product: '1天免佣卡' },
+          { period: 2, start: '2026-06-01', end: '2026-06-15', status: '待开始', users: 0, conversions: 0, winners: 0, remainingReward: 150, purchaseLimit: 400, product: '3天免佣卡' },
+          { period: 3, start: '2026-07-16', end: '2026-07-31', status: '待开始', users: 0, conversions: 0, winners: 0, remainingReward: 150, purchaseLimit: 400, product: '1天免佣卡' },
+        ],
+        bannerPoster: BANNER_POSTER, successPoster: SUCCESS_POSTER, sharePoster: SHARE_POSTER, popupPoster: POPUP_POSTER,
+        rules: '<p>上海城市专属裂变活动。</p>',
+      },
+      4: {
+        id: 4, name: '深圳夏日裂变活动', city: '深圳',
+        cycleStart: '2026-03-01', cycleEnd: '2026-05-31',
+        status: '已结束', product: '1天免佣卡', price: 49.99,
+        qualifyName: '免佣体验资格',
+        tiers: [
+          { threshold: 3, reward: '返 ¥25.00', maxWinners: 300 },
+          { threshold: 6, reward: '返 ¥49.99 本金', maxWinners: null },
+        ],
+        upgrade: 2,
+        periods: [
+          { period: 1, start: '2026-03-01', end: '2026-03-20', status: '已结束', users: 420, conversions: 248, winners: 48, remainingReward: 0, purchaseLimit: 350, product: '1天免佣卡' },
+          { period: 2, start: '2026-03-21', end: '2026-04-10', status: '已结束', users: 580, conversions: 365, winners: 65, remainingReward: 0, purchaseLimit: 350, product: '1天免佣卡' },
+          { period: 3, start: '2026-04-11', end: '2026-04-30', status: '已结束', users: 560, conversions: 340, winners: 72, remainingReward: 0, purchaseLimit: 350, product: '1天免佣卡' },
+          { period: 4, start: '2026-05-01', end: '2026-05-31', status: '已结束', users: 540, conversions: 298, winners: 60, remainingReward: 0, purchaseLimit: 350, product: '1天免佣卡' },
+        ],
+        bannerPoster: BANNER_POSTER, successPoster: SUCCESS_POSTER, sharePoster: SHARE_POSTER, popupPoster: POPUP_POSTER,
+        rules: '<p>深圳夏日专属活动。</p>',
+      },
+      5: {
+        id: 5, name: '杭州城市扩张计划', city: '杭州',
+        cycleStart: '2026-04-01', cycleEnd: '2026-06-30',
+        status: '已关闭', product: '1天免佣卡', price: 89.99,
+        qualifyName: '免佣体验资格',
+        tiers: [
+          { threshold: 5, reward: '返 ¥50.00', maxWinners: 100 },
+          { threshold: 10, reward: '返 ¥89.99 本金', maxWinners: null },
+        ],
+        upgrade: 1,
+        periods: [
+          { period: 1, start: '2026-04-01', end: '2026-04-20', status: '已关闭', users: 280, conversions: 86, winners: 18, remainingReward: 0, purchaseLimit: 450, product: '1天免佣卡' },
+          { period: 2, start: '2026-04-21', end: '2026-05-10', status: '已关闭', users: 220, conversions: 52, winners: 14, remainingReward: 0, purchaseLimit: 450, product: '1天免佣卡' },
+          { period: 3, start: '2026-06-01', end: '2026-06-30', status: '已关闭', users: 180, conversions: 38, winners: 10, remainingReward: 0, purchaseLimit: 450, product: '1天免佣卡' },
+        ],
+        bannerPoster: BANNER_POSTER, successPoster: SUCCESS_POSTER, sharePoster: SHARE_POSTER, popupPoster: POPUP_POSTER,
+        rules: '',
+      },
+      3: {
+        id: 3, name: '广州新用户裂变', city: '广州',
+        cycleStart: '2026-07-01', cycleEnd: '2026-09-30',
+        status: '待开始', product: '1天免佣卡', price: 59.99,
+        qualifyName: '免佣体验资格',
+        tiers: [
+          { threshold: 2, reward: '返 ¥20.00', maxWinners: 300 },
+          { threshold: 5, reward: '返 ¥40.00', maxWinners: null },
+          { threshold: 8, reward: '返 ¥59.99 本金', maxWinners: null },
+        ],
+        upgrade: 3,
+        periods: [
+          { period: 1, start: '2026-07-01', end: '2026-07-20', status: '待开始', users: 0, conversions: 0, winners: 0, remainingReward: 300, purchaseLimit: 600, product: '1天免佣卡' },
+          { period: 2, start: '2026-07-21', end: '2026-08-10', status: '待开始', users: 0, conversions: 0, winners: 0, remainingReward: 300, purchaseLimit: 600, product: '3天免佣卡' },
+          { period: 3, start: '2026-09-01', end: '2026-09-30', status: '待开始', users: 0, conversions: 0, winners: 0, remainingReward: 300, purchaseLimit: 600, product: '5天免佣卡' },
+        ],
+        bannerPoster: BANNER_POSTER, successPoster: SUCCESS_POSTER, sharePoster: SHARE_POSTER, popupPoster: POPUP_POSTER,
+        rules: '<p>广州城市专属裂变活动。</p>',
+      },
+    };
+
+    // ===== Generate User Data =====
+    const generateUserData = (activity) => {
+      const names = ['朱二一','秦二二','尤二三','许二四','何二五','吕二六','施二七','张二八','孔二九','曹三十','严三一','华三二','金三三','陶三四','姜三五','戚三六','谢三七','邹三八','柏三九','窦四十','章四一','云四二','苏四三','潘四四','葛四五','奚四五','范五六','彭六七','郎七八','鲁八九','韦九十','昌十一','马十二','苗十三','凤十四','花十五','俞十六','任十七','陶十八','柳十九','酆二十','鲍廿一','史廿二','唐廿三','费廿四','薛廿五','雷廿六','贺廿七','倪廿八','汤廿九','滕三十','殷卅一','罗卅二','毕卅三','郝卅四','邬卅四','安卅五','常卅六','乐于卅七','卞卅八','齐卅九','康四十','伍余一','元余二','顾余三','孟余四','平余五','黄余六','和余七','穆余八','萧余九','尹余十','姚十一','邵十二','湛十三','汪十四','祁十五','毛十六','禹十六','狄十七','米十八','贝十九','明二十','臧廿一','伏廿二','代廿三','庞廿四','熊廿五','纪廿六','舒廿七','屈廿八','项廿九','祝三十','董卅一','梁卅二','杜卅三','阮卅四','蓝卅五','闵卅六','席卅七','季卅八','麻卅九','强四十','贾余一','路余二','娄余三','危余四','江余五','童余六','颜余七','郭余八','梅余九','盛余十','林十一','刁十二','钟十三','徐十四','邱十五','骆十五','高十六','夏十七','蔡十八','田十九','樊二十','胡廿一','霍廿二','虞廿三','万廿四','支廿五','柯廿六','竺廿七','金廿八','舒廿九','管卅一','卢卅二','莫卅三','经卅四','房卅五','裘卅六','缪卅七','干卅八','解卅九','应四十','宗余一','宣余二','邓余三','郁余四','杭余五','洪余六','包余七','诸余八','左余九','石余十','崔十一','吉十二','钮十三','龚十四','邢十五','滑十六','裴十六','荣十七','翁十八','荀十八','於十九','惠二十','甄廿一','曲廿二','封廿三','储廿四','靳廿五','冀廿六','浦廿七','浦廿八','尚廿九','农卅一','温卅二','戈卅三','饶卅四','查卅五','荆卅六','红卅七','游卅八','竺卅九','权四十'];
+      const accounts = ['1569475695876','1382045789123','1597834620451','1476829530784','1835947261038','1760284935167','1358902473685','1894756382014','1520389467251','1367485920364','1875639028471','1458209367148','1703856924071','1927485036219','1583746092583','1346827950136','1895027384691','1472938560742','1560384927561','1785692038471','1930485726103','1427895036284','1684950273615','1359284760382','1517836049257','1860294857301','1435827690148','1792048573629','1620384957182','1387594026351','1745028369417','1509384627503','1863749205846','1420958376241','1678302945617','1534896027354','1892047583619','1456829037482','1710384956273','1923856047192','1567283940516','1384920756384','1749285036172','1495837260493','1830274958631','1467583029148','1702948573625','1548390627381','1893756024819','1426805937264','1675829043617','1510283947652','1864950273846','1437829506381','1789204857362','1623847590216','1395027486351','1746820593748','1502938467182','1857394026513','1430285967421','1782049583674','1619273840567','1386594027381','1740382956174','1508273946582','1853940627183','1425809376451','1778294053617','1612038495726','1389475026384','1743829506174','1501928374652','1856039427581','1428305967243','1785049283617','1617283940582','1392048573621','1747820594183','1504928367415','1859203847621','1431029485736','1788204956372','1615839204761','1398475026384','1745029386174','1507283946582','1862039457621','1434028596731','1791049283674','1620283947516','1401029384756','1748293056174','1509384726582','1865029483672','1437028596384','1794029385617','1623029485761','1404028375962','1751029384672','1512039486582','1868029457621','1440028596731','1797029384672','1626029485761','1407028375962','1754029386174','1515039486582','1871029457621','1443028596731','1800029384672','1629029485761','1410028375962','1757029386174','1518039486582','1874029457621','1446028596731','1803029384672','1632029485761','1413028375962','1760029386174','1521039486582','1877029457621','1449028596731','1806029384672','1635029485761','1416028375962'];
+      const rewardStatuses = ['未获得', '待发放', '已发放'];
+      const orderStatuses = ['已支付', '待支付', '已取消'];
+      const inviteStatuses = ['已成功', '已失效'];
+
+      const users = [];
+      const periodCount = activity.periods.length;
+
+      for (let p = 0; p < periodCount; p++) {
+        const period = activity.periods[p];
+        const count = period.status === '待开始' ? 0 : (p === 0 ? 28 : (p === 1 ? 35 : 15));
+
+        for (let i = 0; i < count; i++) {
+          const nameIdx = (p * 30 + i) % names.length;
+          const name = names[nameIdx];
+          const account = accounts[nameIdx];
+
+          // Force first 2 users to be "待支付" demo — no purchase, no conversions, no rewards
+          const isPendingDemo = (p === 0 && (i === 0 || i === 1));
+
+          if (isPendingDemo) {
+            // 待支付：已下单但未支付，无转化数据
+            const phonePrefix = '1' + String(Math.floor(Math.random() * 9) + 1) + String(Math.floor(Math.random() * 9));
+            const phoneSuffix = String(Math.floor(Math.random() * 9000 + 1000));
+            const orderPhone = phonePrefix + '****' + phoneSuffix;
+            const orderPhoneFull = phonePrefix + String(Math.floor(Math.random() * 9000 + 1000)) + phoneSuffix;
+            const orderRecords = [{
+              key: `${activity.id}-${p}-${i}-ord-0`,
+              orderNo: `ORD${activityId}${p}${i}${String(Date.now()).slice(-6)}`,
+              activityName: `${activity.name}-第${p + 1}期`,
+              productName: activity.product,
+              orderPhone,
+              orderPhoneFull,
+              amount: activity.price,
+              status: '待支付',
+              createTime: `${period.start} ${String(10 + i).padStart(2,'0')}:${String(i * 15 % 60).padStart(2,'0')}:00`,
+              payTime: '--',
+              refundTime: '--',
+              cancelTime: '--',
+            }];
+            users.push({
+              key: `${activity.id}-${p}-${i}`,
+              period: p,
+              name,
+              account,
+              buyTime: '--',
+              orderStatus: '待支付',
+              conversion: 0,
+              tierLabel: '--',
+              rewardStatus: '未获得',
+              rewardContent: '--',
+              inviteRecords: [],
+              orderRecords,
+              rewardRecords: [],
+            });
+            continue;
+          }
+
+          const conversion = p === 0
+            ? (i < 2 ? 12 : (i < 5 ? 7 : (i < 10 ? 5 : (i < 18 ? 3 : (i < 25 ? 2 : 1)))))
+            : (i < 3 ? 10 : (i < 8 ? 6 : (i < 15 ? 4 : (i < 25 ? 2 : 1))));
+
+          let rewardStatus;
+          if (conversion >= 12) rewardStatus = '已发放';
+          else if (conversion >= 7) rewardStatus = p === 0 ? '已发放' : '待发放';
+          else if (conversion >= 5) rewardStatus = '待发放';
+          else if (conversion >= 3) rewardStatus = '未获得';
+          else rewardStatus = '未获得';
+
+          if (period.status === '进行中' && rewardStatus === '已发放') rewardStatus = '待发放';
+          if (period.status === '进行中') rewardStatus = rewardStatus === '已发放' ? '待发放' : rewardStatus;
+
+          const tierIdx = conversion >= 12 ? 3 : (conversion >= 8 ? 2 : (conversion >= 5 ? 1 : (conversion >= 3 ? 0 : -1)));
+          const tierLabel = tierIdx >= 0 ? `第 ${tierIdx + 1} 档` : '--';
+          const rewardContent = tierIdx >= 0 ? activity.tiers[tierIdx].reward : '--';
+
+          const buyHour = 8 + Math.floor(Math.random() * 14);
+          const buyMin = Math.floor(Math.random() * 60);
+          const buyTime = `${period.start} ${String(buyHour).padStart(2,'0')}:${String(buyMin).padStart(2,'0')}:${String(Math.floor(Math.random()*60)).padStart(2,'0')}`;
+
+          // Generate invite records
+          const inviteCount = conversion;
+          const inviteRecords = [];
+          const failedCount = Math.min(Math.floor(inviteCount * 0.2) + 1, 5);
+          const totalInvite = inviteCount + failedCount;
+          for (let j = 0; j < totalInvite; j++) {
+            const invNameIdx = (p * 30 + i + j * 3) % names.length;
+            const invName = names[invNameIdx];
+            const invAccount = accounts[invNameIdx];
+            const invAccountMasked = invAccount.slice(0, 3) + '****' + invAccount.slice(7);
+            const isFailed = j >= inviteCount;
+            const invStatus = isFailed ? '已失效' : '已成功';
+            const invBuyTime = `${period.start} ${String(10 + j).padStart(2,'0')}:${String(j * 7 % 60).padStart(2,'0')}:00`;
+            const invExpireTime = isFailed ? `${period.end} 23:59:59` : '--';
+            inviteRecords.push({
+              key: `${activity.id}-${p}-${i}-inv-${j}`,
+              inviteeName: invName,
+              inviteeAccount: invAccount,
+              inviteeAccountMasked: invAccountMasked,
+              orderNo: `ORD${Date.now().toString().slice(-8)}${j}`,
+              buyTime: invBuyTime,
+              expireTime: invExpireTime,
+              status: invStatus,
+            });
+          }
+
+          // Generate order records
+          const orderRecords = [];
+          // 待支付只保留上面的2条手动样本，这里只生成已支付/已取消
+          const mainOrderStatus = Math.random() > 0.15 ? '已支付' : '已取消';
+          const phonePrefix = '1' + String(Math.floor(Math.random() * 9) + 1) + String(Math.floor(Math.random() * 9));
+          const phoneSuffix = String(Math.floor(Math.random() * 9000 + 1000));
+          const orderPhone = phonePrefix + '****' + phoneSuffix;
+          const orderPhoneFull = phonePrefix + String(Math.floor(Math.random() * 9000 + 1000)) + phoneSuffix;
+          orderRecords.push({
+            key: `${activity.id}-${p}-${i}-ord-0`,
+            orderNo: `ORD${activityId}${p}${i}${String(Date.now()).slice(-6)}`,
+            activityName: `${activity.name}-第${p + 1}期`,
+            productName: activity.product,
+            orderPhone,
+            orderPhoneFull,
+            amount: activity.price,
+            status: mainOrderStatus,
+            createTime: `${period.start} ${String(buyHour).padStart(2,'0')}:${String(buyMin).padStart(2,'0')}:00`,
+            cancelTime: mainOrderStatus === '已取消' ? `${period.end} 10:00:00` : '--',
+            payTime: mainOrderStatus === '已支付' ? `${period.start} ${String(buyHour).padStart(2,'0')}:${String(buyMin + 2).padStart(2,'0')}:00` : '--',
+            refundTime: mainOrderStatus === '已取消' && Math.random() > 0.3 ? `${period.end} 10:00:00` : '--',
+          });
+
+          // Generate reward records
+          const rewardRecords = [];
+          if (tierIdx >= 0) {
+            rewardRecords.push({
+              key: `${activity.id}-${p}-${i}-rwd-0`,
+              activityName: `${activity.name}-第${p + 1}期`,
+              completion: conversion,
+              rewardContent: activity.tiers[tierIdx].reward,
+              confirmTime: rewardStatus === '已发放' ? `${period.end} 10:00:00` : '--',
+              status: rewardStatus,
+            });
+          }
+
+          users.push({
+            key: `${activity.id}-${p}-${i}`,
+            period: p,
+            name,
+            account,
+            buyTime: mainOrderStatus === '已支付' ? buyTime : (mainOrderStatus === '待支付' ? buyTime : '--'),
+            orderStatus: mainOrderStatus,
+            conversion,
+            tierLabel,
+            rewardStatus,
+            rewardContent,
+            inviteRecords,
+            orderRecords,
+            rewardRecords,
+          });
+        }
+      }
+
+      return users;
+    };
+
+    // ===== Generate Operation Records =====
+    const generateOpRecords = (activity) => {
+      const records = [
+        {
+          key: 'op-1',
+          time: '2026-05-10 14:30:00',
+          operator: '运营-张三',
+          action: '创建活动',
+          detail: `新建活动「${activity.name}」，大周期 ${activity.cycleStart} 至 ${activity.cycleEnd}，共 ${activity.periods.length} 期`,
+        },
+        {
+          key: 'op-2',
+          time: '2026-05-11 09:15:00',
+          operator: '运营-李四',
+          action: '修改活动',
+          detail: '修改了活动配置。涉及变动：修改奖励阶梯配置、修改门槛升值',
+        },
+        ...(activity.status === '已关闭' ? [{
+          key: 'op-3',
+          time: '2026-05-12 16:00:00',
+          operator: '运营-王五',
+          action: '手动关闭',
+          detail: `手动关闭主活动，状态由【进行中】变更为【已关闭】`,
+        }] : []),
+        ...(activity.status === '进行中' && ['待开始', '已结束'].includes(activity.status) ? [] :
+          activity.status === '进行中' ? [{
+            key: 'op-3',
+            time: '2026-05-15 08:00:00',
+            operator: '系统',
+            action: '修改活动',
+            detail: `定时任务：主活动状态由【待开始】变更为【进行中】`,
+          }] : []),
+      ];
+      return records;
+    };
+
+    // ===== Main App =====
+    function App() {
+      const [collapsed, setCollapsed] = useState(false);
+      const [messageApi, contextHolder] = message.useMessage();
+
+      // Get activity
+      const activity = MOCK_ACTIVITIES[activityId] || MOCK_ACTIVITIES[1];
+
+      // Whether to show data (only for activities that have been through at least preview)
+      const showData = !['待开始'].includes(activity.status) || activity.periods.some(p => p.status !== '待开始');
+
+      // View state
+      const [viewMode, setViewMode] = useState('cards'); // 'cards' | 'table'
+      const [selectedPeriod, setSelectedPeriod] = useState(0);
+      const [accountVisible, setAccountVisible] = useState(false);
+
+      // Drawer state
+      const [drawerOpen, setDrawerOpen] = useState(false);
+      const [selectedUser, setSelectedUser] = useState(null);
+      const [drawerTab, setDrawerTab] = useState('invite');
+
+      // Record modal
+      const [recordModalOpen, setRecordModalOpen] = useState(false);
+
+      // Image modal
+      const [previewOpen, setPreviewOpen] = useState(false);
+      const [previewSrc, setPreviewSrc] = useState('');
+
+      // Table filters
+      const [filterNickname, setFilterNickname] = useState('');
+      const [filterRewardContent, setFilterRewardContent] = useState('');
+      const [filterOrderStatus, setFilterOrderStatus] = useState('已支付');
+      const [filterRewardStatus, setFilterRewardStatus] = useState('');
+
+      // Table selection & pagination
+      const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+      const [tablePage, setTablePage] = useState({ current: 1, size: 20 });
+
+      // All user data
+      const [allUserData] = useState(() => generateUserData(activity));
+      const [opRecords] = useState(() => generateOpRecords(activity));
+
+      // Filter user data for current period
+      const periodUserData = useMemo(() => {
+        let data = allUserData.filter(u => u.period === selectedPeriod);
+
+        if (filterNickname.trim()) {
+          const kw = filterNickname.trim().toLowerCase();
+          data = data.filter(u => u.name.toLowerCase().includes(kw) || u.account.toLowerCase().includes(kw));
+        }
+        if (filterRewardContent.trim()) {
+          const kw = filterRewardContent.trim();
+          data = data.filter(u => u.rewardContent.includes(kw));
+        }
+        if (filterOrderStatus) {
+          // Filter by user's primary order status
+          data = data.filter(u => {
+            const mainOrder = u.orderRecords[0];
+            if (!filterOrderStatus) return true;
+            return mainOrder && mainOrder.status === filterOrderStatus;
+          });
+        }
+        if (filterRewardStatus) {
+          data = data.filter(u => u.rewardStatus === filterRewardStatus);
+        }
+
+        // Sort: conversion desc, then buyTime desc
+        data.sort((a, b) => {
+          if (b.conversion !== a.conversion) return b.conversion - a.conversion;
+          return (b.buyTime || '').localeCompare(a.buyTime || '');
+        });
+
+        return data;
+      }, [allUserData, selectedPeriod, filterNickname, filterRewardContent, filterOrderStatus, filterRewardStatus]);
+
+      // Paginated data
+      const paginatedData = useMemo(() => {
+        const start = (tablePage.current - 1) * tablePage.size;
+        return periodUserData.slice(start, start + tablePage.size);
+      }, [periodUserData, tablePage]);
+
+      // Per-period filter state: store filter snapshots per period
+      const [periodFilterState, setPeriodFilterState] = useState(() =>
+        activity.periods.map(() => ({ nickname: '', rewardContent: '', orderStatus: '已支付', rewardStatus: '' }))
+      );
+
+      // Current effective filter = if viewing this period, use live filters; otherwise use stored snapshot
+      const getEffectiveFiltersForPeriod = (periodIdx) => {
+        if (periodIdx === selectedPeriod && viewMode === 'table') {
+          return { nickname: filterNickname, rewardContent: filterRewardContent, orderStatus: filterOrderStatus, rewardStatus: filterRewardStatus };
+        }
+        return periodFilterState[periodIdx] || { nickname: '', rewardContent: '', orderStatus: '已支付', rewardStatus: '' };
+      };
+
+      // Tab counts: compute based on stored filter snapshots (not live filters)
+      const tabCounts = useMemo(() => {
+        return activity.periods.map((p, i) => {
+          const eff = getEffectiveFiltersForPeriod(i);
+          let data = allUserData.filter(u => u.period === i);
+          if (eff.nickname && eff.nickname.trim()) {
+            const kw = eff.nickname.trim().toLowerCase();
+            data = data.filter(u => u.name.toLowerCase().includes(kw) || u.account.toLowerCase().includes(kw));
+          }
+          if (eff.rewardContent && eff.rewardContent.trim()) {
+            const kw = eff.rewardContent.trim();
+            data = data.filter(u => u.rewardContent.includes(kw));
+          }
+          if (eff.orderStatus) {
+            data = data.filter(u => {
+              const mainOrder = u.orderRecords[0];
+              return mainOrder && mainOrder.status === eff.orderStatus;
+            });
+          }
+          if (eff.rewardStatus) {
+            data = data.filter(u => u.rewardStatus === eff.rewardStatus);
+          }
+          return data.length;
+        });
+      }, [allUserData, activity.periods, selectedPeriod, viewMode, periodFilterState, filterNickname, filterRewardContent, filterOrderStatus, filterRewardStatus]);
+
+      // Show checkbox column
+      const showCheckbox = filterRewardStatus === '待发放';
+
+      // Reset table page on period switch
+      useEffect(() => {
+        setTablePage({ current: 1, size: 20 });
+        setSelectedRowKeys([]);
+      }, [selectedPeriod]);
+
+      // Save current filter state before switching to a new period
+      const saveCurrentPeriodFilters = () => {
+        setPeriodFilterState(prev => {
+          const next = [...prev];
+          next[selectedPeriod] = { nickname: filterNickname, rewardContent: filterRewardContent, orderStatus: filterOrderStatus, rewardStatus: filterRewardStatus };
+          return next;
+        });
+      };
+
+      // Switch to table view
+      const handleCardClick = (periodIdx) => {
+        saveCurrentPeriodFilters();
+        setSelectedPeriod(periodIdx);
+        setViewMode('table');
+        // Load stored filters for this period
+        const stored = periodFilterState[periodIdx];
+        if (stored) {
+          setFilterNickname(stored.nickname);
+          setFilterRewardContent(stored.rewardContent || '');
+          setFilterOrderStatus(stored.orderStatus);
+          setFilterRewardStatus(stored.rewardStatus);
+        } else {
+          setFilterNickname('');
+          setFilterRewardContent('');
+          setFilterOrderStatus('已支付');
+          setFilterRewardStatus('');
+        }
+      };
+
+      // Back to cards
+      const handleBackToCards = () => {
+        saveCurrentPeriodFilters();
+        setViewMode('cards');
+        setSelectedRowKeys([]);
+      };
+
+      // Handle tab switch
+      const handlePeriodChange = (newPeriodIdx) => {
+        saveCurrentPeriodFilters();
+        // Load stored filters for the new period
+        const stored = periodFilterState[newPeriodIdx];
+        if (stored) {
+          setFilterNickname(stored.nickname);
+          setFilterRewardContent(stored.rewardContent || '');
+          setFilterOrderStatus(stored.orderStatus);
+          setFilterRewardStatus(stored.rewardStatus);
+        } else {
+          setFilterNickname('');
+          setFilterRewardContent('');
+          setFilterOrderStatus('已支付');
+          setFilterRewardStatus('');
+        }
+        setSelectedPeriod(newPeriodIdx);
+      };
+
+      // Open user drawer
+      const handleViewDetail = (user) => {
+        setSelectedUser(user);
+        setDrawerTab('invite');
+        setDrawerOpen(true);
+      };
+
+      // Batch operation
+      const handleBatchOperation = () => {
+        if (selectedRowKeys.length === 0) return;
+        Modal.confirm({
+          title: '确认批量发放',
+          content: `确定要将选中的 ${selectedRowKeys.length} 条记录状态变更为「已发放」吗？`,
+          okText: '确认',
+          cancelText: '取消',
+          onOk: () => {
+            messageApi.success(`已成功发放 ${selectedRowKeys.length} 条记录`);
+            setSelectedRowKeys([]);
+          },
+        });
+      };
+
+      // Single reward status change
+      const handleRewardChange = (user, newStatus) => {
+        Modal.confirm({
+          title: newStatus === '待发放' ? '确认通过' : '确认发放',
+          content: `确定要将用户「${user.name}」的奖励状态变更为「${newStatus}」吗？`,
+          okText: '确认',
+          cancelText: '取消',
+          onOk: () => {
+            messageApi.success(`已将「${user.name}」的状态变更为「${newStatus}」`);
+          },
+        });
+      };
+
+      // ===== Table columns =====
+      const tableColumns = useMemo(() => {
+        const cols = [];
+        if (showCheckbox) {
+          cols.push({
+            title: <Checkbox checked={selectedRowKeys.length === paginatedData.length && paginatedData.length > 0} onChange={(e) => { setSelectedRowKeys(e.target.checked ? paginatedData.map(d => d.key) : []); }} />,
+            key: 'checkbox',
+            width: 48,
+            align: 'center',
+            render: (_, record) => <Checkbox checked={selectedRowKeys.includes(record.key)} onChange={(e) => { setSelectedRowKeys(prev => e.target.checked ? [...prev, record.key] : prev.filter(k => k !== record.key)); }} />,
+          });
+        }
+        cols.push(
+          { title: '序号', key: 'index', width: 56, align: 'center', render: (_, r, idx) => (tablePage.current - 1) * tablePage.size + idx + 1 },
+          {
+            title: (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                用户昵称 / 小助手账号
+                <span
+                  style={{ cursor: 'pointer', color: accountVisible ? '#1677ff' : '#bfbfbf', display: 'inline-flex', alignItems: 'center' }}
+                  onClick={() => setAccountVisible(!accountVisible)}
+                  title={accountVisible ? '隐藏账号' : '显示账号'}
+                >
+                  {accountVisible ? (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                  )}
+                </span>
+              </span>
+            ),
+            dataIndex: 'name',
+            width: 160,
+            render: (text, record) => {
+              const masked = record.account.slice(0, 3) + '****' + record.account.slice(7);
+              const display = `${record.name}/${accountVisible ? record.account : masked}`;
+              return (
+                <Tooltip title={`${record.name}/${record.account}`}>
+                  <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 160 }}>
+                    <div>{record.name}</div>
+                    <div style={{ color: '#8c8c8c' }}>{accountVisible ? record.account : masked}</div>
+                  </div>
+                </Tooltip>
+              );
+            },
+          },
+          { title: '购买时间', dataIndex: 'buyTime', width: 160, align: 'center', render: (v) => v === '--' ? '--' : v },
+          { title: '订单支付状态', dataIndex: 'orderStatus', width: 110, align: 'center', render: (s) => {
+            const cls = { '已支付': 'status-tag-active', '待支付': 'status-tag-waiting', '已取消': 'status-tag-closed' }[s] || '';
+            return <Tag className={cls}>{s}</Tag>;
+          }},
+          { title: '邀请转化数', dataIndex: 'conversion', width: 100, align: 'center', render: (v) => <span className="cell-number">{v}</span> },
+          { title: '当前达成阶梯', dataIndex: 'tierLabel', width: 100, align: 'center', render: (v) => v === '--' ? <Tag>无</Tag> : <Tag>{v}</Tag> },
+          { title: '奖励内容', dataIndex: 'rewardContent', width: 160, ellipsis: { showTitle: false }, render: (v) => v === '--' ? '--' : <Tooltip title={v}>{v.length > 12 ? v.slice(0, 12) + '...' : v}</Tooltip> },
+          { title: '奖励状态', dataIndex: 'rewardStatus', width: 100, align: 'center', render: (s) => {
+            const cls = { '未获得': 'status-tag-ended', '审核中': 'status-tag-waiting', '待发放': 'status-tag-active', '已发放': 'status-tag-closed' }[s] || '';
+            return <Tag className={cls}>{s}</Tag>;
+          }},
+          {
+            title: '操作', key: 'action', width: 160, align: 'center',
+            render: (_, record) => (
+              <Space size="small">
+                <Button type="link" size="small" onClick={() => handleViewDetail(record)}>查看详情</Button>
+                {record.rewardStatus === '待发放' && (
+                  <Popconfirm title="确认发放" description={`确定要将「${record.name}」的奖励状态变更为「已发放」吗？`} onConfirm={() => handleRewardChange(record, '已发放')} okText="确认" cancelText="取消">
+                    <Button type="link" size="small" className="action-btn text-success">发放</Button>
+                  </Popconfirm>
+                )}
+              </Space>
+            ),
+          },
+        );
+        return cols;
+      }, [showCheckbox, selectedRowKeys, paginatedData, tablePage, handleViewDetail, handleRewardChange, accountVisible]);
+
+      // Stripped plain text from HTML rules
+      const plainRules = useMemo(() => {
+        if (!activity.rules) return '暂无活动规则';
+        return activity.rules.replace(/<[^>]+>/g, '').trim() || '暂无活动规则';
+      }, [activity.rules]);
+
+      // ===== Operation Record columns =====
+      const opColumns = [
+        { title: '操作时间', dataIndex: 'time', width: 180 },
+        { title: '操作人', dataIndex: 'operator', width: 120 },
+        { title: '操作动作', dataIndex: 'action', width: 100, align: 'center', render: (s) => {
+          const cls = { '创建活动': 'status-tag-active', '修改活动': 'status-tag-waiting', '手动关闭': 'status-tag-closed', '手动恢复': 'status-tag-ended' }[s] || '';
+          return <Tag className={cls}>{s}</Tag>;
+        }},
+        { title: '详细说明', dataIndex: 'detail', ellipsis: true, render: (t) => <Tooltip title={t}>{t}</Tooltip> },
+      ];
+
+      return (
+        <Layout style={{ minHeight: '100vh' }}>
+          {contextHolder}
+          <Sider width={200} collapsedWidth={56} theme="dark" collapsible collapsed={collapsed} trigger={null} style={{ overflow: 'auto', height: '100vh', position: 'sticky', top: 0, left: 0 }}>
+            <div className="sidebar-logo" style={{ justifyContent: collapsed ? 'center' : 'flex-start' }}>
+              <div className="sidebar-logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" width="16" height="16">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+              </div>
+              {!collapsed && <span className="sidebar-logo-text">喜行约车</span>}
+            </div>
+            <Menu theme="dark" mode="inline" defaultSelectedKeys={['activity-mgmt']} defaultOpenKeys={['helper', 'free-card']} inlineCollapsed={collapsed} items={menuItems} style={{ borderInlineEnd: 0 }} />
+          </Sider>
+          <Layout>
+            <Header className="header-bar">
+              <div className="header-left">
+                <Button type="text" onClick={() => setCollapsed(!collapsed)} className="header-collapse-btn" aria-label={collapsed ? '展开侧边栏' : '收起侧边栏'}>
+                  {collapsed ? <I d="M9 18l6-6-6-6" size={18} /> : <I d="M4 6h16M4 12h16M4 18h16" size={18} />}
+                </Button>
+                <Breadcrumb items={[
+                  { title: '喜行小助手' },
+                  { title: '免佣卡商城' },
+                  { title: <a href="activity-list.html" style={{ color: '#595959' }}>活动管理</a> },
+                  { title: '活动详情' },
+                ]} />
+              </div>
+              <div className="header-avatar">管</div>
+            </Header>
+            <Content className="detail-page">
+              {/* Page Title Row */}
+              <div className="page-title-row">
+                <div className="page-title-left">
+                  <Button type="text" onClick={() => window.location.href = 'activity-list.html'} className="page-back-btn" icon={<I d="M15 18l-6-6 6-6" size={20} />} />
+                  <span className="page-title-text">活动详情</span>
+                </div>
+                <Button icon={<I d="M12 8v4l3 3M7.49 7.49a9 9 0 100 9.02M16.51 16.51a9 9 0 000-9.02" size={14} />} onClick={() => setRecordModalOpen(true)}>
+                  操作记录
+                </Button>
+              </div>
+
+              {/* ===== Info Card ===== */}
+              <div className="info-card">
+                <Descriptions
+                  bordered
+                  size="small"
+                  column={{ xxl: 4, xl: 3, lg: 3, md: 2, sm: 1, xs: 1 }}
+                  items={[
+                    { label: '活动名称', children: activity.name, span: 1 },
+                    { label: '活动城市', children: activity.city },
+                    { label: '主活动状态', children: <StatusTag status={activity.status} /> },
+                    { label: '活动时间', children: `${activity.cycleStart} 至 ${activity.cycleEnd}` },
+                    { label: '子活动期数', children: `共 ${activity.periods.length} 期` },
+                    { label: '活动规则', children: (
+                      <Tooltip title={<div dangerouslySetInnerHTML={{ __html: activity.rules || '暂无规则' }} />}>
+                        <span style={{ cursor: 'pointer', display: 'inline-block', maxWidth: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {plainRules.length > 50 ? plainRules.slice(0, 50) + '...' : plainRules}
+                        </span>
+                      </Tooltip>
+                    ), span: 2 },
+                    { label: 'Banner图', children: (
+                      <img className="poster-thumb" src={activity.bannerPoster} alt="Banner图" onClick={() => { setPreviewSrc(activity.bannerPoster); setPreviewOpen(true); }} />
+                    )},
+                    { label: '活动弹窗宣传海报', children: (
+                      <img className="poster-thumb" src={activity.popupPoster} alt="活动弹窗宣传海报" onClick={() => { setPreviewSrc(activity.popupPoster); setPreviewOpen(true); }} />
+                    )},
+                    { label: '活动详情页-活动海报', children: (
+                      <img className="poster-thumb" src={activity.bannerPoster} alt="活动详情页-活动海报" onClick={() => { setPreviewSrc(activity.bannerPoster); setPreviewOpen(true); }} />
+                    )},
+                    { label: '支付成功页-宣传海报', children: (
+                      <img className="poster-thumb" src={activity.successPoster} alt="支付成功页-宣传海报" onClick={() => { setPreviewSrc(activity.successPoster); setPreviewOpen(true); }} />
+                    )},
+                    { label: '分享海报', children: (
+                      <img className="poster-thumb" src={activity.sharePoster} alt="分享海报" onClick={() => { setPreviewSrc(activity.sharePoster); setPreviewOpen(true); }} />
+                    )},
+                    {
+                      label: '奖励阶梯',
+                      children: (
+                        <ul className="tier-list">
+                          {activity.tiers.map((t, i) => (
+                            <li key={i}>
+                              转化 {t.threshold} 人 → {t.reward}
+                              <span style={{ color: '#8c8c8c', marginLeft: 6 }}>(上限 {i === 0 && t.maxWinners ? t.maxWinners + ' 人' : '无限制'})</span>
+                              {i === activity.tiers.length - 1 && <Tag color="blue" style={{ fontSize: 10, padding: '0 4px', marginLeft: 8, lineHeight: '16px' }}>返还本金</Tag>}
+                            </li>
+                          ))}
+                        </ul>
+                      ),
+                      span: 3,
+                    },
+                    { label: '门槛类型及升值', children: <span>所有阶梯 + {activity.upgrade}人</span> },
+                  ]}
+                />
+              </div>
+
+              {/* ===== Special State: No data ===== */}
+              {!showData && (
+                <div className="no-data-hint">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="48" height="48">
+                    <path d="M12 8v4M12 16h.01M3 21h18M5 21V7l8-4v18M19 21V11l-6-6" />
+                  </svg>
+                  <p>该活动尚未开始，暂无活动数据可查看</p>
+                </div>
+              )}
+
+              {/* ===== Card View ===== */}
+              {showData && (
+                <>
+                  <div className={`card-grid ${viewMode === 'table' ? 'hidden' : ''}`}>
+                    {activity.periods.map((period, idx) => (
+                      <div className="period-card" key={idx} onClick={() => handleCardClick(idx)}>
+                        <div className="period-card-header">
+                          <span className="period-card-title">第 {period.period} 期</span>
+                          <StatusTag status={period.status} />
+                        </div>
+                        <div className="period-card-time">{period.start} ~ {period.end}</div>
+                        <div style={{ fontSize: 13, marginBottom: 12 }}>
+                          <span style={{ color: '#595959' }}>推广商品：</span><span style={{ color: '#262626' }}>{period.product || '--'}</span>
+                        </div>
+                        <div className="metric-grid">
+                          <div className="metric-item">
+                            <div className="metric-label">参与用户数</div>
+                            <div className="metric-value">{period.users}</div>
+                          </div>
+                          <div className="metric-item">
+                            <div className="metric-label">邀请转化数</div>
+                            <div className="metric-value">{period.conversions}</div>
+                          </div>
+                          <div className="metric-item">
+                            <div className="metric-label">获奖用户数</div>
+                            <div className="metric-value">{period.winners}</div>
+                          </div>
+                          <div className="metric-item">
+                            <div className="metric-label">最高奖励剩余</div>
+                            <div className="metric-value">{period.remainingReward}<span className="metric-unit"> 份</span></div>
+                          </div>
+                        </div>
+                        <div className="period-card-footer">
+                          <span>资格购买上限</span>
+                          <span style={{ fontWeight: 500 }}>{period.purchaseLimit} 人</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* ===== Table View ===== */}
+                  <div className={`table-view ${viewMode === 'cards' ? 'hidden' : ''}`}>
+                    {/* Toolbar */}
+                    <div className="table-toolbar">
+                      <div className="table-toolbar-left">
+                        <Button type="text" onClick={handleBackToCards} icon={<I d="M15 18l-6-6 6-6" size={18} />} />
+                      </div>
+                      <div className="table-toolbar-right period-segmented" style={{ flex: 1 }}>
+                        {React.createElement(antd.Segmented, {
+                          value: selectedPeriod,
+                          onChange: handlePeriodChange,
+                          options: activity.periods.map((p, i) => ({
+                            label: `第 ${p.period} 期 (${tabCounts[i] || 0})`,
+                            value: i,
+                          })),
+                        })}
+                      </div>
+                      <div className="table-toolbar-right">
+                        {showCheckbox && (
+                          <Button
+                            type="primary"
+                            size="middle"
+                            disabled={selectedRowKeys.length === 0}
+                            onClick={handleBatchOperation}
+                            style={{ fontWeight: 500 }}
+                          >
+                            批量发放
+                            {selectedRowKeys.length > 0 && ` (${selectedRowKeys.length})`}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Filters */}
+                    <div className="table-filter-row">
+                      <div className="table-filter-item">
+                        <span className="table-filter-label">用户昵称 / 小助手账号</span>
+                        <Input
+                          placeholder="请输入用户昵称或账号"
+                          value={filterNickname}
+                          onChange={(e) => setFilterNickname(e.target.value)}
+                          allowClear
+                          style={{ width: 200 }}
+                        />
+                      </div>
+                      <div className="table-filter-item">
+                        <span className="table-filter-label">奖励内容</span>
+                        <Input
+                          placeholder="搜索奖励内容"
+                          value={filterRewardContent}
+                          onChange={(e) => setFilterRewardContent(e.target.value)}
+                          allowClear
+                          style={{ width: 160 }}
+                        />
+                      </div>
+                      <div className="table-filter-item">
+                        <span className="table-filter-label">订单支付状态</span>
+                        <Select
+                          value={filterOrderStatus}
+                          onChange={(v) => setFilterOrderStatus(v || '')}
+                          allowClear
+                          style={{ width: 140 }}
+                          options={[
+                            { label: '全部', value: '' },
+                            { label: '已支付', value: '已支付' },
+                            { label: '待支付', value: '待支付' },
+                            { label: '已取消', value: '已取消' },
+                          ]}
+                        />
+                      </div>
+                      <div className="table-filter-item">
+                        <span className="table-filter-label">奖励状态</span>
+                        <Select
+                          value={filterRewardStatus}
+                          onChange={(v) => setFilterRewardStatus(v || '')}
+                          allowClear
+                          style={{ width: 140 }}
+                          options={[
+                            { label: '全部', value: '' },
+                            { label: '未获得', value: '未获得' },
+                            { label: '待发放', value: '待发放' },
+                            { label: '已发放', value: '已发放' },
+                          ]}
+                        />
+                      </div>
+                      <Button type="primary" onClick={() => {
+                        saveCurrentPeriodFilters();
+                        setTablePage({ current: 1, size: tablePage.size });
+                      }}>查询</Button>
+                      <Button onClick={() => {
+                        setFilterNickname('');
+                        setFilterRewardContent('');
+                        setFilterOrderStatus('已支付');
+                        setFilterRewardStatus('');
+                        setTablePage({ current: 1, size: tablePage.size });
+                        // Also save the reset state to current period
+                        setPeriodFilterState(prev => {
+                          const next = [...prev];
+                          next[selectedPeriod] = { nickname: '', rewardContent: '', orderStatus: '已支付', rewardStatus: '' };
+                          return next;
+                        });
+                      }}>重置</Button>
+                      <Button icon={<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>} style={{ marginLeft: 'auto' }}>导出</Button>
+                    </div>
+
+                    {/* Table */}
+                    <div className="table-container" style={{ padding: 16 }}>
+                      <Table
+                        columns={tableColumns}
+                        dataSource={paginatedData}
+                        rowKey="key"
+                        pagination={false}
+                        scroll={{ x: 1200 }}
+                        locale={{ emptyText: '暂无参与用户' }}
+                        rowClassName={(record) => selectedRowKeys.includes(record.key) ? 'ant-table-row-selected' : ''}
+                      />
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
+                        <Pagination
+                          current={tablePage.current}
+                          pageSize={tablePage.size}
+                          total={periodUserData.length}
+                          showSizeChanger
+                          showQuickJumper
+                          pageSizeOptions={['10', '20', '50']}
+                          showTotal={(total) => `共 ${total} 条`}
+                          onChange={(page, size) => { setTablePage({ current: page, size: size || tablePage.size }); }}
+                          onShowSizeChange={(page, size) => { setTablePage({ current: 1, size }); }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </Content>
+          </Layout>
+
+          {/* ===== User Detail Drawer ===== */}
+          <Drawer
+            title="用户详情"
+            placement="right"
+            width={720}
+            open={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+            destroyOnClose
+          >
+            {selectedUser && (
+              <>
+                {/* User Base Info */}
+                <div className="drawer-user-info">
+                  <Descriptions
+                    bordered
+                    size="small"
+                    column={2}
+                    items={[
+                      { label: '用户昵称', children: selectedUser.name },
+                      { label: '用户账号', children: selectedUser.account },
+                      { label: '购买时间', children: selectedUser.buyTime },
+                      { label: '所属子活动期次', children: <Tag>第 {selectedUser.period + 1} 期</Tag> },
+                      { label: '邀请转化数', children: <span className="cell-number">{selectedUser.conversion}</span> },
+                      { label: '当前达成阶梯', children: selectedUser.tierLabel === '--' ? '无' : <Tag>{selectedUser.tierLabel}</Tag> },
+                      { label: '奖励状态', children: (() => {
+                        const cls = { '未获得': 'status-tag-ended', '审核中': 'status-tag-waiting', '待发放': 'status-tag-active', '已发放': 'status-tag-closed' }[selectedUser.rewardStatus] || '';
+                        return <Tag className={cls}>{selectedUser.rewardStatus}</Tag>;
+                      })()},
+                      { label: '奖励内容', children: selectedUser.rewardContent === '--' ? '无' : selectedUser.rewardContent },
+                    ]}
+                  />
+                </div>
+
+                {/* Tabs */}
+                <div className="drawer-tabs-area">
+                  <Tabs
+                    items={[
+                      {
+                        key: 'invite',
+                        label: '邀请记录',
+                        children: <InviteTable records={selectedUser.inviteRecords} />,
+                      },
+                      {
+                        key: 'order',
+                        label: '订单记录',
+                        children: <OrderTable records={selectedUser.orderRecords} />,
+                      },
+                      {
+                        key: 'reward',
+                        label: '奖励记录',
+                        children: <RewardTab records={selectedUser.rewardRecords} />,
+                      },
+                    ]}
+                    defaultActiveKey="invite"
+                    onChange={(key) => setDrawerTab(key)}
+                  />
+                </div>
+              </>
+            )}
+          </Drawer>
+
+          {/* ===== Operation Record Modal ===== */}
+          <Modal
+            title="操作记录"
+            open={recordModalOpen}
+            onCancel={() => setRecordModalOpen(false)}
+            footer={null}
+            width={800}
+          >
+            <Table
+              className="record-modal-table"
+              columns={opColumns}
+              dataSource={opRecords}
+              rowKey="key"
+              pagination={{ pageSize: 10, showTotal: (t) => `共 ${t} 条` }}
+              locale={{ emptyText: '暂无操作记录' }}
+            />
+          </Modal>
+
+          {/* ===== Image Preview Modal ===== */}
+          <Modal
+            open={previewOpen}
+            onCancel={() => setPreviewOpen(false)}
+            footer={null}
+            width="auto"
+            bodyStyle={{ padding: 16, textAlign: 'center' }}
+          >
+            <img
+              src={previewSrc}
+              alt="预览"
+              style={{ maxWidth: '100%', maxHeight: '70vh', borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.15)' }}
+            />
+          </Modal>
+        </Layout>
+      );
+    }
+
+    // ===== Sub-components =====
+
+    function InviteTable({ records }) {
+      const [filterStatus, setFilterStatus] = useState('已成功');
+      const [accountVisible, setAccountVisible] = useState(false);
+      const filtered = useMemo(() => {
+        return records.filter(r => r.status === filterStatus);
+      }, [records, filterStatus]);
+
+      const hasFailed = records.some(r => r.status === '已失效');
+      const columns = useMemo(() => [
+        { title: '序号', key: 'index', width: 56, align: 'center', render: (_, __, idx) => idx + 1 },
+        { title: '被邀请人昵称', dataIndex: 'inviteeName', width: 120, ellipsis: { showTitle: false }, render: (v) => {
+          const display = v.length > 12 ? v.slice(0, 12) + '...' : v;
+          return <Tooltip title={v}>{display}</Tooltip>;
+        }},
+        {
+          title: (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              被邀请人账号
+              <span
+                style={{ cursor: 'pointer', color: accountVisible ? '#1677ff' : '#bfbfbf', display: 'inline-flex', alignItems: 'center' }}
+                onClick={() => setAccountVisible(!accountVisible)}
+                title={accountVisible ? '隐藏账号' : '显示账号'}
+              >
+                {accountVisible ? (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                )}
+              </span>
+            </span>
+          ),
+          width: 150,
+          render: (_, record) => accountVisible ? record.inviteeAccount : record.inviteeAccountMasked,
+        },
+        { title: '订单号', dataIndex: 'orderNo', width: 180, ellipsis: true },
+        { title: '完成时间（购买时间）', dataIndex: 'buyTime', width: 170, align: 'center' },
+        ...(hasFailed ? [{ title: '失效时间（退款时间）', dataIndex: 'expireTime', width: 170, align: 'center', render: (v) => v === '--' ? '--' : v }] : []),
+        { title: '邀请状态', dataIndex: 'status', width: 90, align: 'center', render: (s) => <Tag className={s === '已成功' ? 'status-tag-active' : 'status-tag-closed'}>{s}</Tag> },
+      ], [hasFailed, accountVisible]);
+
+      if (records.length === 0) {
+        return <div className="drawer-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="40" height="40"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8z" /></svg><p>暂无邀请记录</p></div>;
+      }
+
+      return (
+        <>
+          <div style={{ marginBottom: 12, display: 'flex', gap: 12, alignItems: 'center' }}>
+            <span style={{ fontSize: 12, color: '#8c8c8c' }}>邀请状态</span>
+            <Select value={filterStatus} onChange={setFilterStatus} style={{ width: 140 }} options={[
+              { label: '已成功', value: '已成功' },
+              { label: '已失效', value: '已失效' },
+            ]} />
+          </div>
+          <Table columns={columns} dataSource={filtered} rowKey="key" pagination={{ pageSize: 10 }} locale={{ emptyText: '暂无数据' }} scroll={{ y: 300 }} size="small" />
+        </>
+      );
+    }
+
+    function OrderTable({ records }) {
+      const [phoneVisible, setPhoneVisible] = useState(false);
+      const columns = [
+        { title: '订单编号', dataIndex: 'orderNo', width: 180, ellipsis: true },
+        {
+          title: (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              接单手机号
+              <span
+                style={{ cursor: 'pointer', color: phoneVisible ? '#1677ff' : '#bfbfbf', display: 'inline-flex', alignItems: 'center' }}
+                onClick={() => setPhoneVisible(!phoneVisible)}
+                title={phoneVisible ? '隐藏手机号' : '显示手机号'}
+              >
+                {phoneVisible ? (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                )}
+              </span>
+            </span>
+          ),
+          dataIndex: 'orderPhone',
+          width: 140,
+          align: 'center',
+          render: (_, record) => (phoneVisible ? record.orderPhoneFull : record.orderPhone) || '--',
+        },
+        { title: '活动名称-期次', dataIndex: 'activityName', width: 180, ellipsis: true },
+        { title: '商品名称', dataIndex: 'productName', width: 120 },
+        { title: '订单金额', dataIndex: 'amount', width: 100, align: 'center', render: (v) => <span>¥{Number(v).toFixed(2)}</span> },
+        { title: '订单状态', dataIndex: 'status', width: 90, align: 'center', render: (s) => {
+          const cls = { '待支付': 'status-tag-waiting', '已支付': 'status-tag-active', '已取消': 'status-tag-closed' }[s] || '';
+          return <Tag className={cls}>{s}</Tag>;
+        }},
+        { title: '创建时间', dataIndex: 'createTime', width: 160, render: (v) => v === '--' ? '--' : v },
+        { title: '取消时间', dataIndex: 'cancelTime', width: 160, render: (v) => v === '--' ? '--' : v },
+        { title: '支付时间', dataIndex: 'payTime', width: 160, render: (v) => v === '--' ? '--' : v },
+        { title: '退款时间', dataIndex: 'refundTime', width: 160, render: (v) => v === '--' ? '--' : v },
+      ];
+
+      if (records.length === 0) {
+        return <div className="drawer-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="40" height="40"><path d="M20 12V6a2 2 0 00-2-2H6a2 2 0 00-2 2v6M6 12v4a2 2 0 002 2h8a2 2 0 002-2v-4M6 12h12" /></svg><p>暂无订单记录</p></div>;
+      }
+
+      return <Table columns={columns} dataSource={records} rowKey="key" pagination={{ pageSize: 10 }} locale={{ emptyText: '暂无数据' }} scroll={{ y: 300 }} size="small" />;
+    }
+
+    function RewardTab({ records }) {
+      const [messageApi, contextHolder] = message.useMessage();
+
+      const columns = [
+        { title: '活动名称-期次', dataIndex: 'activityName', width: 180, ellipsis: true },
+        { title: '完成数', dataIndex: 'completion', width: 80, align: 'center', render: (v) => <span className="cell-number">{v}</span> },
+        { title: '奖励内容', dataIndex: 'rewardContent', width: 200 },
+        { title: '确认发放时间', dataIndex: 'confirmTime', width: 160, render: (v) => v === '--' ? '--' : v },
+        { title: '发放状态', dataIndex: 'status', width: 90, align: 'center', render: (s) => {
+          const cls = { '审核中': 'status-tag-waiting', '待发放': 'status-tag-active', '已发放': 'status-tag-closed' }[s] || '';
+          return <Tag className={cls}>{s}</Tag>;
+        }},
+        {
+          title: '操作', key: 'action', width: 120, align: 'center',
+          render: (_, record) => (
+            <Space size="small">
+              {record.status === '待发放' && (
+                <Popconfirm title="确认发放" description="确定发放该奖励吗？" onConfirm={() => messageApi.success('已发放奖励')} okText="确认" cancelText="取消">
+                  <Button type="link" size="small">发放</Button>
+                </Popconfirm>
+              )}
+            </Space>
+          ),
+        },
+      ];
+
+      if (records.length === 0) {
+        return <div className="drawer-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="40" height="40"><path d="M12 15l-2 5-3-1 1-3-3-2 3-1-1-3 2 2 2-2-1 3 3 1-3 1z" /></svg><p>暂未获得任何奖励</p></div>;
+      }
+
+      return <>{contextHolder}<Table columns={columns} dataSource={records} rowKey="key" pagination={{ pageSize: 10 }} locale={{ emptyText: '暂无数据' }} scroll={{ y: 300 }} size="small" /></>;
+    }
+
+    // Tabs needs to be destructured from antd
+    const { Tabs } = antd;
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
